@@ -848,7 +848,7 @@
 
     <script>
         // Configuration
-        const API_URL = 'http://localhost:8000';
+        const API_URL = window.location.origin; // Use current domain (works with localhost and ngrok)
         const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
 
         let menuFile = null;
