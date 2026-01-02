@@ -1,4 +1,4 @@
-# Feature Documentation - Social Automation Platform v2.1.0
+# Feature Documentation - Social Automation Platform v2.1.1
 
 ## Overview
 Multi-tenant restaurant social media automation platform with AI-powered content generation, strategic scheduling, and comprehensive analytics.
@@ -184,15 +184,15 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ### 5. Monthly Content Calendar
 **Status**: ✅ Complete
-**Version**: 2.1.0 (Enhanced)
+**Version**: 2.1.1 (Enhanced - Hybrid Scheduling)
 
-**Description**: AI-generated monthly calendars with strategically distributed posts and configurable AI usage.
+**Description**: AI-generated monthly calendars with hybrid day-of-week scheduling, strategic distribution, and configurable AI usage.
 
 **Components**:
 - Monthly calendar generation (5-31 posts, default: 8, recommended: 8-15)
 - Dynamic post count generation - generates exactly the requested number
-- Strategic post distribution across month
-- Smart scheduling based on sales patterns
+- **Hybrid day-of-week scheduling** - posts land on strategically optimal days
+- Smart scheduling respects marketing strategy (target_day from suggestions)
 - Visual calendar grid UI
 - Approval workflow
 - Full CRUD operations
@@ -200,12 +200,13 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - **NEW**: Complete OpenAI request/response logging
 - **NEW**: Real-time generation progress tracking
 
-**Strategic Scheduling**:
-- **Promotional posts**: 10:00 AM (slow days)
-- **Product showcases**: 6:00 PM (dinner time)
-- **Weekend drivers**: 5:00 PM Friday
-- **Engagement posts**: 12:00 PM (lunch)
-- **Customer appreciation**: 3:00 PM
+**Strategic Scheduling** (v2.1.1):
+- **Promotional posts**: Thursdays (slow days) at 10:00 AM
+- **Product showcases**: Tuesdays at 6:00 PM (dinner time)
+- **Weekend drivers**: Fridays at 5:00 PM (drive weekend traffic!)
+- **Engagement posts**: Wednesdays at 12:00 PM (mid-week engagement)
+- **Customer appreciation**: Thursdays at 3:00 PM
+- Posts distribute across different weeks (no clustering on same days)
 
 **AI Configuration Modes** (v2.1.0):
 - **Mixed Mode** (Default, `use_ai_for_all_posts = False`):
@@ -466,7 +467,7 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ---
 
-## 📊 Current System Status (v2.1.0)
+## 📊 Current System Status (v2.1.1)
 
 ### Fully Operational Features:
 1. ✅ Multi-tenant architecture
@@ -569,7 +570,15 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - FastAPI server with auto-reload
 - ngrok tunnel for development
 
-### Recent Additions (v2.1.0):
+### Recent Additions (v2.1.1):
+- **Hybrid Day-of-Week Scheduling**: Posts now land on strategically optimal days
+- **Fixed Sunday/Wednesday Clustering**: No more posts concentrated on 2 days
+- **Target Day Respect**: Weekend posts on Fridays, engagement on Wednesdays, etc.
+- **Smart Distribution**: Multiple posts wanting same day spread across different weeks
+- **Fallback Logic**: Adjacent day selection when preferred day is full
+- **Strategic Placement**: Single posts use middle occurrence for better spacing
+
+### Previous Additions (v2.1.0):
 - **Configurable AI Usage**: Toggle between full AI mode and mixed template/AI mode
 - **Dynamic Post Count**: Generate exactly the requested number of posts (5-31)
 - **Default Post Count**: Changed from 25 to 8 (more realistic for monthly planning)
@@ -578,7 +587,7 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - **Real-time Progress**: Generation progress tracking with detailed logs
 - **Enhanced Post Variety**: Looping logic creates diverse posts until target count
 
-### Previous Additions (v1.0.3):
+### Additions (v1.0.3):
 - Monthly content calendar fully functional
 - Dashboard chart fixed
 - Sales insights enhanced with statistics
@@ -587,5 +596,5 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 ---
 
 **Last Updated**: 2026-01-02
-**Version**: 2.1.0
-**Status**: Production-ready for restaurant social media automation with advanced AI cost controls
+**Version**: 2.1.1
+**Status**: Production-ready for restaurant social media automation with strategic day-of-week scheduling

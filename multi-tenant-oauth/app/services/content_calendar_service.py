@@ -474,14 +474,11 @@ class ContentCalendarService:
 
         suggestions = suggestions_result.get('suggestions', [])
 
-        # Distribute posts across the month
-        days_to_post = self._calculate_posting_schedule(month_days, len(suggestions))
+        # Distribute posts across the month using hybrid scheduling
+        # This respects target_day preferences while ensuring even distribution
+        post_schedule = self._smart_day_distribution(suggestions, year, month)
 
-        for i, suggestion in enumerate(suggestions):
-            if i >= len(days_to_post):
-                break
-
-            day_number = days_to_post[i]
+        for suggestion, day_number in post_schedule:
             post_date = date(year, month, day_number)
             day_name = post_date.strftime('%A')
 
@@ -557,6 +554,99 @@ class ContentCalendarService:
                 days.append(day)
 
         return sorted(days)
+
+    def _smart_day_distribution(
+        self,
+        suggestions: List[Dict[str, Any]],
+        year: int,
+        month: int
+    ) -> List[tuple[Dict[str, Any], int]]:
+        """
+        Hybrid scheduling: Respect target_day preferences while ensuring even distribution.
+
+        Args:
+            suggestions: List of post suggestions with target_day field
+            year: Year for the calendar
+            month: Month number (1-12)
+
+        Returns:
+            List of (suggestion, day_number) tuples
+        """
+        import calendar
+        from collections import defaultdict
+
+        # Get number of days in month
+        month_days = calendar.monthrange(year, month)[1]
+
+        # Build map of day names to day numbers in the month
+        # E.g., {"Monday": [1, 8, 15, 22, 29], "Tuesday": [2, 9, 16, 23, 30], ...}
+        day_name_to_numbers = defaultdict(list)
+        for day_num in range(1, month_days + 1):
+            day_date = date(year, month, day_num)
+            day_name = day_date.strftime('%A')
+            day_name_to_numbers[day_name].append(day_num)
+
+        # Group suggestions by their target_day
+        target_day_groups = defaultdict(list)
+        for suggestion in suggestions:
+            target_day = suggestion.get('target_day', 'Monday')  # Default to Monday if not specified
+            target_day_groups[target_day].append(suggestion)
+
+        # Distribute posts to specific days
+        result = []
+        used_days = set()
+
+        # Process each target day group
+        for target_day, posts in target_day_groups.items():
+            available_days = [d for d in day_name_to_numbers[target_day] if d not in used_days]
+
+            if not available_days:
+                # Fallback: target day is full, use adjacent days
+                # Try next day, then previous day
+                fallback_days = []
+                for offset in [1, -1, 2, -2, 3, -3]:
+                    fallback_date = date(year, month, 1) + timedelta(days=offset)
+                    if fallback_date.month == month:
+                        fallback_day_name = fallback_date.strftime('%A')
+                        fallback_days.extend([d for d in day_name_to_numbers[fallback_day_name] if d not in used_days])
+                available_days = fallback_days[:len(posts)]
+
+            # Distribute posts across available days of this type
+            # If we have 3 posts and 4 Fridays, space them out: use Fridays 1, 2, 4 (skip 3)
+            num_posts = len(posts)
+            num_available = len(available_days)
+
+            if num_available >= num_posts:
+                # Space posts evenly across available days
+                if num_posts == 1:
+                    # Single post: use the middle occurrence
+                    selected_days = [available_days[num_available // 2]]
+                else:
+                    # Multiple posts: distribute evenly
+                    step = num_available / num_posts
+                    selected_days = [available_days[int(i * step)] for i in range(num_posts)]
+            else:
+                # More posts than available days - use all available days
+                selected_days = available_days
+
+            # Assign posts to days
+            for i, post in enumerate(posts):
+                if i < len(selected_days):
+                    day_num = selected_days[i]
+                    result.append((post, day_num))
+                    used_days.add(day_num)
+                else:
+                    # Fallback: find any unused day
+                    for day_num in range(1, month_days + 1):
+                        if day_num not in used_days:
+                            result.append((post, day_num))
+                            used_days.add(day_num)
+                            break
+
+        # Sort by day number to maintain chronological order
+        result.sort(key=lambda x: x[1])
+
+        return result
 
     def _get_optimal_posting_time(
         self,

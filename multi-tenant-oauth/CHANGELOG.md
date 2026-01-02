@@ -21,6 +21,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.1] - 2026-01-02
+
+### Fixed
+- **Calendar Scheduling Logic - Hybrid Day-of-Week Distribution**
+  - Fixed posts clustering on same days of the week (previously all on Sunday/Wednesday)
+  - Implemented hybrid scheduling algorithm that respects `target_day` from post suggestions
+  - Weekend traffic posts now actually post on Fridays (not Wednesdays)
+  - Engagement posts now land on Wednesdays (not random Sundays)
+  - Customer appreciation posts now schedule on Thursdays (not Wednesdays)
+  - Product showcase posts distribute across Tuesdays throughout the month
+
+### Changed
+- **Smart Day Distribution Algorithm**
+  - Posts now scheduled based on marketing strategy (day-of-week) instead of mathematical distribution (day-of-month)
+  - When multiple posts want the same day, they spread across different weeks
+  - Falls back to adjacent days if preferred day is full
+  - Single posts land on middle occurrence of target day for better distribution
+  - Maintains chronological order within the month
+
+### Technical Details
+- Added `_smart_day_distribution()` method to ContentCalendarService
+- Groups suggestions by `target_day` field
+- Builds map of day names to day numbers for the month
+- Distributes posts evenly across available occurrences of target days
+- Replaced mathematical `_calculate_posting_schedule()` with strategic scheduling
+- Modified `_generate_calendar_posts()` to use new hybrid algorithm
+
+### Example Improvement
+**Before (v2.1.0):** 8 posts → Days 1, 4, 8, 11, 15, 18, 22, 25 (all Sunday/Wednesday)
+**After (v2.1.1):** 8 posts → Thu 1st, Tue 6th, Tue 13th, Fri 16th, Wed 21st, Thu 22nd, Tue 27th, Thu 29th (strategic days)
+
+### Benefits
+- ✅ Posts appear on strategically optimal days of the week
+- ✅ Weekend traffic posts actually drive Friday→Saturday traffic
+- ✅ Engagement posts hit mid-week engagement peaks
+- ✅ Better distribution across the week (not clustered on 2 days)
+- ✅ Respects marketing strategy from AI analysis
+
+---
+
 ## [2.1.0] - 2026-01-02
 
 ### Added
