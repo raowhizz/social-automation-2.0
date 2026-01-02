@@ -27,6 +27,8 @@ class PostSuggestionService:
         else:
             self.client = None
         self.image_service = ImageService()
+        # Store OpenAI request/response data for logging
+        self.openai_calls = []
 
     # Text length presets
     TEXT_LENGTH_PRESETS = {
@@ -62,6 +64,7 @@ class PostSuggestionService:
         tenant_id: str,
         count: int = 5,
         text_length: str = 'extra_long',
+        return_metadata: bool = False,
     ) -> Dict[str, Any]:
         """
         Generate intelligent post suggestions based on restaurant context.
@@ -454,7 +457,8 @@ class PostSuggestionService:
         post_type: str,
         context: Dict[str, Any],
         text_length: str = 'extra_long',
-    ) -> tuple[str, str]:
+        return_metadata: bool = False,
+    ):
         """
         Generate post text using GPT-4 with rich context.
 
@@ -462,9 +466,11 @@ class PostSuggestionService:
             post_type: Type of post to generate
             context: Context dictionary with restaurant info
             text_length: Text length preset ('short', 'medium', 'long', 'extra_long')
+            return_metadata: If True, return dict with full request/response data
 
         Returns:
-            Tuple of (post_text, generation_source)
+            If return_metadata=False: Tuple of (post_text, generation_source)
+            If return_metadata=True: Dict with post_text, request_data, response_data
         """
         try:
             # Get text length preset
@@ -501,20 +507,72 @@ Write a compelling social media post ({length_preset['sentences']} sentences, ma
 - Keep it concise and impactful
 """
 
-            response = self.client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert social media manager specializing in restaurant marketing. You create engaging, authentic posts that drive customer engagement and sales."
-                    },
+            # Prepare request data
+            system_message = "You are an expert social media manager specializing in restaurant marketing. You create engaging, authentic posts that drive customer engagement and sales."
+
+            request_params = {
+                "model": "gpt-4",
+                "messages": [
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.8,
-                max_tokens=length_preset['max_tokens'],
-            )
+                "temperature": 0.8,
+                "max_tokens": length_preset['max_tokens'],
+            }
 
-            return response.choices[0].message.content.strip(), "openai"
+            # Call OpenAI API
+            from datetime import datetime
+            start_time = datetime.now()
+            response = self.client.chat.completions.create(**request_params)
+            end_time = datetime.now()
+
+            post_text = response.choices[0].message.content.strip()
+
+            # Always capture request/response data for logging
+            request_data = {
+                "model": request_params["model"],
+                "temperature": request_params["temperature"],
+                "max_tokens": request_params["max_tokens"],
+                "system_message": system_message,
+                "user_prompt": prompt,
+                "post_type": post_type,
+                "text_length": text_length,
+            }
+
+            response_data = {
+                "post_text": post_text,
+                "model": response.model,
+                "finish_reason": response.choices[0].finish_reason,
+                "usage": {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens,
+                },
+                "response_time_ms": int((end_time - start_time).total_seconds() * 1000),
+            }
+
+            # Calculate cost (GPT-4 pricing)
+            prompt_cost = response.usage.prompt_tokens * 0.00003  # $0.03 per 1K tokens
+            completion_cost = response.usage.completion_tokens * 0.00006  # $0.06 per 1K tokens
+            total_cost = prompt_cost + completion_cost
+            response_data["estimated_cost_usd"] = round(total_cost, 6)
+
+            # Store in instance variable for retrieval by calendar service
+            self.openai_calls.append({
+                "request": request_data,
+                "response": response_data,
+            })
+
+            # If metadata is requested, return complete data
+            if return_metadata:
+                return {
+                    "post_text": post_text,
+                    "generation_source": "openai",
+                    "request_data": request_data,
+                    "response_data": response_data,
+                }
+
+            return post_text, "openai"
 
         except Exception as e:
             logger.error(f"Error generating post with AI: {e}")

@@ -1862,26 +1862,63 @@
                     stepHTML += '</div>';
                 }
 
-                // Add request/response if present
-                if (step.request) {
+                // Add OpenAI request/response data if present
+                if (step.request && step.request.openai_calls) {
+                    const openaiCalls = step.request.openai_calls;
+
+                    stepHTML += '<div style="margin-top: 20px;">';
+                    stepHTML += '<div class="step-section-title">🤖 OpenAI API Calls</div>';
+
+                    openaiCalls.forEach((call, callIndex) => {
+                        stepHTML += `<div style="margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">`;
+                        stepHTML += `<div style="font-weight: 600; margin-bottom: 10px; color: #667eea;">Call ${callIndex + 1} of ${openaiCalls.length}</div>`;
+
+                        // Request section
+                        stepHTML += `
+                            <div class="step-request" style="margin-bottom: 15px;">
+                                <div class="step-section-title">📤 Request to OpenAI</div>
+                                <div class="code-block">
+                                    <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(call.request))})">📋 Copy</button>
+                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(call.request, null, 2)}</pre>
+                                </div>
+                            </div>
+                        `;
+
+                        // Response section
+                        stepHTML += `
+                            <div class="step-response">
+                                <div class="step-section-title">📥 Response from OpenAI</div>
+                                <div class="code-block">
+                                    <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(call.response))})">📋 Copy</button>
+                                    <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(call.response, null, 2)}</pre>
+                                </div>
+                            </div>
+                        `;
+
+                        stepHTML += '</div>';
+                    });
+
+                    stepHTML += '</div>';
+                } else if (step.request) {
+                    // Fallback: show request as before if not openai_calls format
                     stepHTML += `
                         <div class="step-request">
                             <div class="step-section-title">📤 Request</div>
                             <div class="code-block">
                                 <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(step.request))})">📋 Copy</button>
-                                <pre>${JSON.stringify(step.request, null, 2)}</pre>
+                                <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(step.request, null, 2)}</pre>
                             </div>
                         </div>
                     `;
                 }
 
-                if (step.response) {
+                if (step.response && !step.request?.openai_calls) {
                     stepHTML += `
                         <div class="step-response">
                             <div class="step-section-title">📥 Response</div>
                             <div class="code-block">
                                 <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(step.response))})">📋 Copy</button>
-                                <pre>${JSON.stringify(step.response, null, 2)}</pre>
+                                <pre style="white-space: pre-wrap; word-wrap: break-word;">${JSON.stringify(step.response, null, 2)}</pre>
                             </div>
                         </div>
                     `;

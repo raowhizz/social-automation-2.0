@@ -46,7 +46,8 @@ class ContentGenerator:
         recent_captions: Optional[List[str]] = None,
         max_length: int = 2200,
         text_length: str = "extra_long",
-    ) -> str:
+        return_metadata: bool = False,
+    ):
         """
         Generate a social media post caption using AI.
 
@@ -87,21 +88,61 @@ class ContentGenerator:
             max_length=max_length,
         )
 
+        # Prepare request data
+        system_message = "You are a creative social media manager specialized in restaurant marketing. You create engaging, authentic posts that drive customer engagement and sales."
+
+        request_params = {
+            "model": self.text_model,
+            "messages": [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.8,
+            "max_tokens": 500,
+        }
+
         try:
-            response = self.client.chat.completions.create(
-                model=self.text_model,  # Use model from environment variable
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a creative social media manager specialized in restaurant marketing. You create engaging, authentic posts that drive customer engagement and sales.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.8,
-                max_tokens=500,
-            )
+            # Call OpenAI API
+            start_time = datetime.now()
+            response = self.client.chat.completions.create(**request_params)
+            end_time = datetime.now()
 
             caption = response.choices[0].message.content.strip()
+
+            # If metadata is requested, return complete data
+            if return_metadata:
+                request_data = {
+                    "model": request_params["model"],
+                    "temperature": request_params["temperature"],
+                    "max_tokens": request_params["max_tokens"],
+                    "system_message": system_message,
+                    "user_prompt": prompt,
+                }
+
+                response_data = {
+                    "caption": caption,
+                    "model": response.model,
+                    "finish_reason": response.choices[0].finish_reason,
+                    "usage": {
+                        "prompt_tokens": response.usage.prompt_tokens,
+                        "completion_tokens": response.usage.completion_tokens,
+                        "total_tokens": response.usage.total_tokens,
+                    },
+                    "response_time_ms": int((end_time - start_time).total_seconds() * 1000),
+                }
+
+                # Calculate cost (GPT-4 pricing as of 2024)
+                prompt_cost = response.usage.prompt_tokens * 0.00003  # $0.03 per 1K tokens
+                completion_cost = response.usage.completion_tokens * 0.00006  # $0.06 per 1K tokens
+                total_cost = prompt_cost + completion_cost
+                response_data["estimated_cost_usd"] = round(total_cost, 6)
+
+                return {
+                    "caption": caption,
+                    "request_data": request_data,
+                    "response_data": response_data,
+                }
+
             return caption
 
         except Exception as e:

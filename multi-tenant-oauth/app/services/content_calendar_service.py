@@ -401,24 +401,42 @@ class ContentCalendarService:
 
         This is a wrapper around _generate_calendar_posts that adds logging.
         """
-        # For now, call the original method
-        # We'll enhance this to log each individual post generation
+        # Clear any previous OpenAI calls
+        self.suggestion_service.openai_calls = []
+
+        # Call the original method
         posts = await self._generate_calendar_posts(
             db, tenant_id, calendar_id, year, month, posts_count, profile
         )
 
-        # Add logging for each post (simplified version)
+        # Retrieve OpenAI calls made during generation
+        openai_calls = self.suggestion_service.openai_calls
+
+        # Add logging for each post with OpenAI request/response data
         for i, post in enumerate(posts, 1):
             post_date = post.scheduled_date.strftime("%b %d") if post.scheduled_date else f"Post {i}"
+
+            # Get corresponding OpenAI call if available
+            openai_data = openai_calls[i-1] if i <= len(openai_calls) else None
+
             gen_log.steps[-1].metadata[f"post_{i}"] = {
                 "date": post_date,
                 "caption_preview": post.post_text[:50] + "..." if len(post.post_text) > 50 else post.post_text,
                 "status": "✓ Generated"
             }
 
+            # Add OpenAI request/response data if available
+            if openai_data:
+                gen_log.steps[-1].metadata[f"post_{i}_openai"] = openai_data
+
             # Update current status for progress display
             gen_log.steps[-1].metadata["current_status"] = f"✓ Generated post {i}/{posts_count}: {post_date}"
             gen_log.steps[-1].metadata["next_status"] = f"⏳ Generating post {i+1}/{posts_count}..." if i < posts_count else "✓ All posts generated!"
+
+        # Store full OpenAI data in the step for easy access
+        if openai_calls:
+            gen_log.steps[-1].request = {"openai_calls": openai_calls}
+            gen_log.steps[-1].response = {"total_calls": len(openai_calls)}
 
         return posts
 
