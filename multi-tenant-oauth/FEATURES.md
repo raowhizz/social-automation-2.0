@@ -1,4 +1,4 @@
-# Feature Documentation - Social Automation Platform v1.0.3
+# Feature Documentation - Social Automation Platform v2.1.0
 
 ## Overview
 Multi-tenant restaurant social media automation platform with AI-powered content generation, strategic scheduling, and comprehensive analytics.
@@ -184,17 +184,21 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ### 5. Monthly Content Calendar
 **Status**: ✅ Complete
-**Version**: 1.0.3
+**Version**: 2.1.0 (Enhanced)
 
-**Description**: AI-generated monthly calendars with strategically distributed posts.
+**Description**: AI-generated monthly calendars with strategically distributed posts and configurable AI usage.
 
 **Components**:
-- Monthly calendar generation (20-30 posts)
+- Monthly calendar generation (5-31 posts, default: 8, recommended: 8-15)
+- Dynamic post count generation - generates exactly the requested number
 - Strategic post distribution across month
 - Smart scheduling based on sales patterns
 - Visual calendar grid UI
 - Approval workflow
 - Full CRUD operations
+- **NEW**: Configurable AI usage toggle for cost control
+- **NEW**: Complete OpenAI request/response logging
+- **NEW**: Real-time generation progress tracking
 
 **Strategic Scheduling**:
 - **Promotional posts**: 10:00 AM (slow days)
@@ -203,12 +207,30 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - **Engagement posts**: 12:00 PM (lunch)
 - **Customer appreciation**: 3:00 PM
 
+**AI Configuration Modes** (v2.1.0):
+- **Mixed Mode** (Default, `use_ai_for_all_posts = False`):
+  - Promotional posts → AI ✅
+  - Product showcase posts → AI ✅
+  - Weekend driver posts → AI ✅
+  - Engagement posts → Template 📝
+  - Customer appreciation posts → Template 📝
+  - **Cost**: ~4-6 OpenAI calls for 8 posts
+
+- **Full AI Mode** (`use_ai_for_all_posts = True`):
+  - All post types → AI ✅
+  - **Cost**: 8 OpenAI calls for 8 posts
+  - Higher quality, higher costs
+  - Configured via Restaurant Config UI toggle
+
 **Workflow**:
-1. Generate calendar for month/year
-2. Review posts in calendar grid
-3. Edit individual posts (text, date, time, platform, hashtags)
-4. Approve all posts
-5. Posts ready for publishing
+1. Configure AI usage in Restaurant Config (optional)
+2. Generate calendar for month/year with desired post count
+3. Monitor real-time generation progress with detailed logs
+4. Review posts in calendar grid
+5. View complete OpenAI request/response data (if enabled in Developer Mode)
+6. Edit individual posts (text, date, time, platform, hashtags)
+7. Approve all posts
+8. Posts ready for publishing
 
 **Database Tables**:
 - `content_calendars` - Monthly calendars
@@ -381,15 +403,17 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ### 9. Restaurant Configuration
 **Status**: ✅ Complete
-**Version**: 1.0.1
+**Version**: 2.1.0 (Enhanced)
 
-**Description**: Upload and manage restaurant data (menu, sales).
+**Description**: Upload and manage restaurant data (menu, sales) and configure AI settings.
 
 **Components**:
 - Menu Excel upload
 - Sales Excel upload
 - Profile viewing
 - Data import status
+- **NEW**: Developer Mode toggle (view OpenAI prompts)
+- **NEW**: AI for All Posts toggle (cost control)
 
 **Supported Formats**:
 - Menu: Excel (.xlsx) with columns: Category, Item Name, Description, Price
@@ -400,12 +424,23 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - Import progress indication
 - Automatic intelligence regeneration
 - Data validation
+- **NEW**: Toggle switches for AI configuration
+- **NEW**: Real-time settings persistence
+
+**Configuration Options** (v2.1.0):
+1. **Developer Mode**: View OpenAI prompts before they're sent (debugging/transparency)
+2. **Use AI for All Posts**: Generate all posts with AI vs mixed template/AI mode
 
 **UI**:
-- `/ui/config` - Configuration interface
+- `/ui/config` - Configuration interface with AI toggles
+
+**API Endpoints**:
+- `POST /api/v1/restaurant/{tenant_id}/settings/toggle-prompt-preview`
+- `POST /api/v1/restaurant/{tenant_id}/settings/toggle-ai-for-all`
 
 **Files**:
 - `app/static/restaurant-config.html`
+- `app/api/restaurant.py`
 
 ---
 
@@ -431,7 +466,7 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ---
 
-## 📊 Current System Status (v1.0.3)
+## 📊 Current System Status (v2.1.0)
 
 ### Fully Operational Features:
 1. ✅ Multi-tenant architecture
@@ -439,11 +474,11 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 3. ✅ Token encryption and management
 4. ✅ Restaurant intelligence system
 5. ✅ AI post suggestions
-6. ✅ Monthly content calendar
+6. ✅ Monthly content calendar with configurable AI usage
 7. ✅ Manual post creation
 8. ✅ Brand asset management
 9. ✅ Dashboard with analytics
-10. ✅ Restaurant configuration
+10. ✅ Restaurant configuration with AI settings
 
 ### Total Database Tables: 16
 - tenants, tenant_users
@@ -534,7 +569,16 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - FastAPI server with auto-reload
 - ngrok tunnel for development
 
-### Recent Additions (v1.0.3):
+### Recent Additions (v2.1.0):
+- **Configurable AI Usage**: Toggle between full AI mode and mixed template/AI mode
+- **Dynamic Post Count**: Generate exactly the requested number of posts (5-31)
+- **Default Post Count**: Changed from 25 to 8 (more realistic for monthly planning)
+- **AI Cost Control**: "Use AI for All Posts" toggle in Restaurant Config
+- **Complete Transparency**: Full OpenAI request/response logging
+- **Real-time Progress**: Generation progress tracking with detailed logs
+- **Enhanced Post Variety**: Looping logic creates diverse posts until target count
+
+### Previous Additions (v1.0.3):
 - Monthly content calendar fully functional
 - Dashboard chart fixed
 - Sales insights enhanced with statistics
@@ -542,6 +586,6 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ---
 
-**Last Updated**: 2025-12-29
-**Version**: 1.0.3
-**Status**: Production-ready for restaurant social media automation
+**Last Updated**: 2026-01-02
+**Version**: 2.1.0
+**Status**: Production-ready for restaurant social media automation with advanced AI cost controls

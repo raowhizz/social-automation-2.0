@@ -21,6 +21,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.1.0] - 2026-01-02
+
+### Added
+- **Content Calendar Generation Improvements**
+  - Added `use_ai_for_all_posts` configuration field to RestaurantProfile model
+  - New UI toggle in Restaurant Config: "🤖 Use AI for All Posts"
+  - API endpoint: `POST /api/v1/restaurant/{tenant_id}/settings/toggle-ai-for-all`
+  - Complete OpenAI request/response logging for transparency and debugging
+  - Real-time progress tracking during calendar generation with detailed logs
+
+### Changed
+- **Calendar Post Count**: Default changed from 25 to 8 posts (recommended: 8-15)
+- **Post Generation Logic**: Now generates exactly the requested number of posts
+  - Loops through post strategies until reaching target count
+  - Adds variety with random menu items and promotional variations
+  - Maximum 10 cycles to prevent infinite loops
+- **AI Content Generation**: Engagement and customer appreciation posts now support AI mode
+  - When `use_ai_for_all_posts = True`: All posts use OpenAI GPT-4
+  - When `use_ai_for_all_posts = False` (default): Mixed mode uses templates for some posts
+  - Mixed mode saves costs while maintaining quality for key promotional posts
+
+### Fixed
+- **Post Count Mismatch**: Calendar generation now respects requested post count
+  - Previously only generated up to 6 posts regardless of request
+  - Now generates 8, 15, 25, or any requested count (5-31 range)
+
+### Technical Details
+- Database migration: `20260101_2222_1cc5db06fca8_add_use_ai_for_all_posts_to_restaurant_`
+- Modified files:
+  - `app/models/restaurant_profile.py` - Added `use_ai_for_all_posts` boolean field
+  - `app/services/post_suggestion_service.py` - Looping logic + AI configuration
+  - `app/static/calendar.html` - Default post count change
+  - `app/static/restaurant-config.html` - AI toggle UI
+  - `app/api/restaurant.py` - New settings endpoint
+- Backend: 396 insertions, 19 deletions across 6 files
+
+### Benefits
+- **Cost Control**: Users can now control OpenAI costs by toggling AI usage
+- **Flexibility**: Generate exactly the number of posts needed for monthly planning
+- **Transparency**: Full visibility into OpenAI API interactions
+- **Better Defaults**: 8 posts/month is more realistic for most restaurants
+
+---
+
 ## [1.0.4] - 2025-12-30
 
 ### Fixed

@@ -33,6 +33,16 @@ This platform enables restaurant owners to:
 - **Platform Optimization**: Different strategies for Facebook vs Instagram
 - **Customizable Tone**: Professional, casual, humorous, promotional, educational
 - **Context-Aware**: Uses restaurant description, item details, and brand voice
+- **Configurable AI Usage**: Toggle between full AI mode or mixed template/AI mode for cost control
+
+### Content Calendar Management
+- **Monthly Calendars**: Generate complete monthly content calendars with AI-powered posts
+- **Flexible Post Count**: Create 5-31 posts per month (default: 8, recommended: 8-15)
+- **Strategic Planning**: AI analyzes restaurant data to create diverse post strategies
+- **Post Variety**: Promotional posts, product showcases, weekend drivers, engagement polls, customer appreciation
+- **AI Cost Control**: Toggle "Use AI for All Posts" to control OpenAI usage and costs
+- **Progress Tracking**: Real-time generation progress with detailed logs
+- **Complete Transparency**: View full OpenAI request/response data for debugging
 
 ### Brand Asset Management
 - **Hierarchical Folders**: Organize images by category (Food, Drinks, Restaurant, Seasonal)
