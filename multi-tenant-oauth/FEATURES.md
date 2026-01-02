@@ -1,4 +1,4 @@
-# Feature Documentation - Social Automation Platform v2.1.1
+# Feature Documentation - Social Automation Platform v2.2.0
 
 ## Overview
 Multi-tenant restaurant social media automation platform with AI-powered content generation, strategic scheduling, and comprehensive analytics.
@@ -261,9 +261,9 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ### 6. Manual Post Creation
 **Status**: ✅ Complete
-**Version**: 1.0.1
+**Version**: 2.2.0 (Enhanced - Auto-Population)
 
-**Description**: Create and schedule individual posts with AI caption generation.
+**Description**: Create and schedule individual posts with AI caption generation and smart form auto-population from image metadata.
 
 **Components**:
 - Manual post creation form
@@ -272,8 +272,13 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - Image upload
 - Platform selection (Facebook/Instagram/Both)
 - Scheduling for future publication
+- **NEW**: Auto-populate fields from image metadata
 
 **Features**:
+- **Image-first workflow** - Select image before filling form
+- **Auto-populate** - Item Name and Description filled from selected image metadata
+- **Visual feedback** - Green border flash on auto-filled fields
+- **Smart behavior** - Only fills empty fields, preserves user input
 - Generate AI captions with context
 - Browse brand asset library
 - Quick upload new images
@@ -404,17 +409,30 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ### 9. Restaurant Configuration
 **Status**: ✅ Complete
-**Version**: 2.1.0 (Enhanced)
+**Version**: 2.2.0 (Enhanced - Social Account Management)
 
-**Description**: Upload and manage restaurant data (menu, sales) and configure AI settings.
+**Description**: Upload and manage restaurant data (menu, sales), configure AI settings, and manage connected social media accounts.
 
 **Components**:
 - Menu Excel upload
 - Sales Excel upload
 - Profile viewing
 - Data import status
-- **NEW**: Developer Mode toggle (view OpenAI prompts)
-- **NEW**: AI for All Posts toggle (cost control)
+- Developer Mode toggle (view OpenAI prompts)
+- AI for All Posts toggle (cost control)
+- **NEW**: Connected Social Accounts management section
+
+**Social Account Management** (v2.2.0):
+- **Account Display**: Visual cards showing all connected Facebook/Instagram accounts
+- **Status Monitoring**: Token health badges with expiration countdown
+  - ✅ Green: Connected (7+ days remaining)
+  - ⚠️ Yellow: Expires soon (< 7 days)
+  - ❌ Red: Expired
+- **Connect/Reconnect**: Initiate OAuth flow to add or refresh accounts
+- **Disconnect**: Remove accounts with confirmation dialog
+- **Account Details**: Platform icon, account name, platform ID, connection date
+- **Empty State**: Helpful message when no accounts connected
+- **OAuth Callback**: Automatic success/error handling after authentication
 
 **Supported Formats**:
 - Menu: Excel (.xlsx) with columns: Category, Item Name, Description, Price
@@ -425,19 +443,24 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - Import progress indication
 - Automatic intelligence regeneration
 - Data validation
-- **NEW**: Toggle switches for AI configuration
-- **NEW**: Real-time settings persistence
+- Toggle switches for AI configuration
+- Real-time settings persistence
+- **Dynamic URL support**: Works with both localhost and ngrok
 
-**Configuration Options** (v2.1.0):
+**Configuration Options**:
 1. **Developer Mode**: View OpenAI prompts before they're sent (debugging/transparency)
 2. **Use AI for All Posts**: Generate all posts with AI vs mixed template/AI mode
+3. **Social Accounts**: Connect/manage Facebook and Instagram accounts
 
 **UI**:
-- `/ui/config` - Configuration interface with AI toggles
+- `/ui/config` - Configuration interface with AI toggles and account management
 
 **API Endpoints**:
 - `POST /api/v1/restaurant/{tenant_id}/settings/toggle-prompt-preview`
 - `POST /api/v1/restaurant/{tenant_id}/settings/toggle-ai-for-all`
+- `GET /api/v1/accounts/connected` - List connected accounts
+- `POST /api/v1/oauth/facebook/authorize` - Start OAuth flow
+- `DELETE /api/v1/oauth/accounts/{id}` - Disconnect account
 
 **Files**:
 - `app/static/restaurant-config.html`
@@ -467,7 +490,7 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 
 ---
 
-## 📊 Current System Status (v2.1.1)
+## 📊 Current System Status (v2.2.0)
 
 ### Fully Operational Features:
 1. ✅ Multi-tenant architecture
@@ -476,10 +499,10 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 4. ✅ Restaurant intelligence system
 5. ✅ AI post suggestions
 6. ✅ Monthly content calendar with configurable AI usage
-7. ✅ Manual post creation
+7. ✅ Manual post creation with auto-populate from image metadata
 8. ✅ Brand asset management
 9. ✅ Dashboard with analytics
-10. ✅ Restaurant configuration with AI settings
+10. ✅ Restaurant configuration with social account management and AI settings
 
 ### Total Database Tables: 16
 - tenants, tenant_users
@@ -570,7 +593,17 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 - FastAPI server with auto-reload
 - ngrok tunnel for development
 
-### Recent Additions (v2.1.1):
+### Recent Additions (v2.2.0):
+- **Social Account Management UI**: Connect, reconnect, and disconnect Facebook/Instagram accounts directly from Restaurant Config
+- **Account Status Monitoring**: Real-time token health badges with expiration countdown
+- **Dynamic URL Support**: Works with both localhost and ngrok for OAuth flow
+- **Auto-Populate Post Fields**: Image metadata automatically fills Item Name and Description in Create Post
+- **Image-First Workflow**: Reordered form to select image before filling details
+- **Visual Feedback**: Green border flash when fields are auto-populated
+- **Smart Auto-Fill**: Only fills empty fields, preserves existing user input
+- **Enhanced Buttons**: Emoji icons for better UX (📁 Browse, 📤 Upload)
+
+### Previous Additions (v2.1.1):
 - **Hybrid Day-of-Week Scheduling**: Posts now land on strategically optimal days
 - **Fixed Sunday/Wednesday Clustering**: No more posts concentrated on 2 days
 - **Target Day Respect**: Weekend posts on Fridays, engagement on Wednesdays, etc.
@@ -596,5 +629,5 @@ Multi-tenant restaurant social media automation platform with AI-powered content
 ---
 
 **Last Updated**: 2026-01-02
-**Version**: 2.1.1
-**Status**: Production-ready for restaurant social media automation with strategic day-of-week scheduling
+**Version**: 2.2.0
+**Status**: Production-ready for restaurant social media automation with account management and smart form auto-population

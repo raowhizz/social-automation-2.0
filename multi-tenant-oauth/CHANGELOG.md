@@ -21,6 +21,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2026-01-02
+
+### Added
+- **Social Account Management UI in Restaurant Config**
+  - Connected accounts section showing all linked Facebook/Instagram pages
+  - Account status badges with token expiration monitoring
+  - Connect/Reconnect/Disconnect functionality with confirmation dialogs
+  - Visual account cards displaying platform, name, connection date, and health status
+  - Empty state UI for when no accounts are connected
+  - OAuth callback handler for seamless post-authentication flow
+
+- **Auto-Populate Post Fields from Image Metadata**
+  - Image selection moved to top of Create Post form for better UX
+  - Automatic population of "Item Name" from asset title metadata
+  - Automatic population of "Description" from asset description metadata
+  - Visual feedback (green border flash) when fields are auto-filled
+  - Smart behavior: only fills empty fields, preserves user-entered data
+  - Works with both "Browse Asset Library" and "Quick Upload" methods
+  - Helpful tip text guiding users to select image first
+
+### Fixed
+- **OAuth Redirect URI Configuration**
+  - Updated redirect URIs to support ngrok for development
+  - Fixed "Can't load URL" error from Facebook OAuth
+  - Changed API_URL from hardcoded localhost to dynamic `window.location.origin`
+  - Now works seamlessly with both localhost and ngrok domains
+  - Fixed CORS issues when accessing via public URLs
+
+### Changed
+- Create Post form field order optimized for better workflow
+- Image selection buttons enhanced with emoji icons (📁 📤)
+- Restaurant config page now shows connected social accounts prominently
+
+### Technical
+- Enhanced `showSelectedImage()` function with metadata extraction
+- Added account management JavaScript functions for OAuth flow
+- Improved form UX with visual feedback on auto-population
+- Dynamic API URL detection for multi-domain support
+
+---
+
 ## [2.1.1] - 2026-01-02
 
 ### Fixed
