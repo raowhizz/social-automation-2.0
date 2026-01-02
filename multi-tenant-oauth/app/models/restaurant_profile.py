@@ -41,6 +41,7 @@ class RestaurantProfile(Base):
 
     # Feature flags
     show_prompt_previews = Column(Boolean, default=False, nullable=False)
+    use_ai_for_all_posts = Column(Boolean, default=False, nullable=False)  # Force AI for all posts vs template mix
 
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

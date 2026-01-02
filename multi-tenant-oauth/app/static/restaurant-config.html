@@ -762,6 +762,20 @@
                 </div>
             </div>
 
+            <!-- AI for All Posts Toggle -->
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #d1fae5;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <strong style="color: #333;">🤖 Use AI for All Posts</strong>
+                        <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">Generate all posts with AI. When disabled, some posts will use templates to save costs.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="useAiForAllToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
             <div id="analysisLoading" class="loading" style="display: none;">
                 <div class="spinner"></div>
                 <p>Analyzing your restaurant data...</p>
@@ -1278,9 +1292,11 @@
         function initPromptPreview() {
             // Load toggle state from profile
             loadPromptPreviewState();
+            loadAiForAllState();
 
-            // Setup toggle handler
+            // Setup toggle handlers
             document.getElementById('promptPreviewToggle').addEventListener('change', handleToggleChange);
+            document.getElementById('useAiForAllToggle').addEventListener('change', handleAiForAllToggleChange);
 
             // Setup view prompts button
             document.getElementById('viewPromptsBtn').addEventListener('click', showPromptModal);
@@ -1320,6 +1336,39 @@
                 if (response.ok) {
                     document.getElementById('viewPromptsBtn').style.display = enabled ? 'block' : 'none';
                     showAlert('analysisAlerts', enabled ? 'Developer mode enabled - You can now view prompts' : 'Developer mode disabled', 'success');
+                } else {
+                    e.target.checked = !enabled;
+                    showAlert('analysisAlerts', 'Failed to update settings', 'error');
+                }
+            } catch (error) {
+                e.target.checked = !enabled;
+                showAlert('analysisAlerts', 'Error updating settings', 'error');
+            }
+        }
+
+        async function loadAiForAllState() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/profile`);
+                if (response.ok) {
+                    const profile = await response.json();
+                    const isEnabled = profile.use_ai_for_all_posts || false;
+                    document.getElementById('useAiForAllToggle').checked = isEnabled;
+                }
+            } catch (error) {
+                console.error('Error loading AI for all posts state:', error);
+            }
+        }
+
+        async function handleAiForAllToggleChange(e) {
+            const enabled = e.target.checked;
+            try {
+                const response = await fetch(
+                    `${API_URL}/api/v1/restaurant/${TENANT_ID}/settings/toggle-ai-for-all?enabled=${enabled}`,
+                    { method: 'POST' }
+                );
+
+                if (response.ok) {
+                    showAlert('analysisAlerts', enabled ? 'AI enabled for all posts - Higher quality, higher costs' : 'Mixed mode enabled - Some posts will use templates', 'success');
                 } else {
                     e.target.checked = !enabled;
                     showAlert('analysisAlerts', 'Failed to update settings', 'error');

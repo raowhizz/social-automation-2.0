@@ -167,6 +167,7 @@ class PostSuggestionService:
             'top_sellers': top_sellers,
             'slowest_days': slowest_days,
             'busiest_days': busiest_days,
+            'use_ai_for_all_posts': profile.use_ai_for_all_posts if hasattr(profile, 'use_ai_for_all_posts') else False,
         }
 
         # Strategy 1: Slow Day Promotion
@@ -219,11 +220,13 @@ class PostSuggestionService:
                 suggestions.append(suggestion)
 
         # Strategy 4: Behind the Scenes / Engagement
+        use_ai_for_all = context.get('use_ai_for_all_posts', False)
         suggestion = await self._create_engagement_post(
             restaurant_name=restaurant_name,
             brand_voice=brand_voice,
             profile=profile,
-            text_length=text_length
+            text_length=text_length,
+            use_ai=use_ai_for_all
         )
         if suggestion:
             suggestions.append(suggestion)
@@ -232,10 +235,76 @@ class PostSuggestionService:
         suggestion = await self._create_customer_appreciation_post(
             restaurant_name=restaurant_name,
             brand_voice=brand_voice,
-            text_length=text_length
+            text_length=text_length,
+            use_ai=use_ai_for_all
         )
         if suggestion:
             suggestions.append(suggestion)
+
+        # If we don't have enough posts yet, cycle through strategies again
+        cycle_count = 0
+        max_cycles = 10  # Prevent infinite loops
+        while len(suggestions) < count and cycle_count < max_cycles:
+            cycle_count += 1
+
+            # Add more product showcase posts with random menu items
+            if len(suggestions) < count and menu_items:
+                import random
+                random_item = random.choice(menu_items)
+                suggestion = await self._create_product_showcase_post(
+                    restaurant_name=restaurant_name,
+                    brand_voice=brand_voice,
+                    item=random_item,
+                    is_bestseller=False,
+                    rank=len(suggestions) + 1,
+                    context=context,
+                    text_length=text_length
+                )
+                if suggestion:
+                    suggestions.append(suggestion)
+
+            # Add promotional posts with variations
+            if len(suggestions) < count and slowest_days:
+                import random
+                target_day = random.choice(slowest_days) if slowest_days else 'Monday'
+                suggestion = await self._create_promotional_post(
+                    restaurant_name=restaurant_name,
+                    brand_voice=brand_voice,
+                    promo={
+                        'target_day': target_day,
+                        'suggested_discount': random.choice(['15% off', '20% off', 'Buy 1 Get 1', '10% off']),
+                        'strategy': random.choice(['Special Offer', 'Happy Hour', 'Limited Time Deal']),
+                        'reason': f'Drive traffic on {target_day}'
+                    },
+                    menu_items=menu_items,
+                    context=context,
+                    text_length=text_length
+                )
+                if suggestion:
+                    suggestions.append(suggestion)
+
+            # Add engagement posts
+            if len(suggestions) < count:
+                suggestion = await self._create_engagement_post(
+                    restaurant_name=restaurant_name,
+                    brand_voice=brand_voice,
+                    profile=profile,
+                    text_length=text_length,
+                    use_ai=use_ai_for_all
+                )
+                if suggestion:
+                    suggestions.append(suggestion)
+
+            # Add customer appreciation posts
+            if len(suggestions) < count:
+                suggestion = await self._create_customer_appreciation_post(
+                    restaurant_name=restaurant_name,
+                    brand_voice=brand_voice,
+                    text_length=text_length,
+                    use_ai=use_ai_for_all
+                )
+                if suggestion:
+                    suggestions.append(suggestion)
 
         # Return requested number of suggestions
         return suggestions[:count]
@@ -254,7 +323,7 @@ class PostSuggestionService:
         discount = promo.get('suggested_discount', '15% off')
         strategy = promo.get('strategy', 'Special Offer')
 
-        # Use GPT-4 or template
+        # Use GPT-4 or template (promotional posts always use AI when available)
         if self.openai_api_key:
             post_text, generation_source = await self._generate_post_with_ai(
                 post_type='promotional',
@@ -402,16 +471,31 @@ class PostSuggestionService:
         brand_voice: str,
         profile: RestaurantProfile,
         text_length: str = 'extra_long',
+        use_ai: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """Create an engagement/poll post."""
         cuisine = profile.cuisine_type or "food"
 
-        post_text = f"🤔 Question for our {cuisine} lovers!\n\n"
-        post_text += f"What's your go-to order at {restaurant_name}?\n\n"
-        post_text += "A) Our signature dishes\n"
-        post_text += "B) Try something new each time\n"
-        post_text += "C) The same favorite every time\n\n"
-        post_text += "Comment below! 👇"
+        # Use AI if configured
+        if self.openai_api_key and use_ai:
+            post_text, generation_source = await self._generate_post_with_ai(
+                post_type='engagement',
+                context={
+                    'restaurant_name': restaurant_name,
+                    'brand_voice': brand_voice,
+                    'cuisine_type': cuisine,
+                },
+                text_length=text_length
+            )
+        else:
+            # Template fallback
+            post_text = f"🤔 Question for our {cuisine} lovers!\n\n"
+            post_text += f"What's your go-to order at {restaurant_name}?\n\n"
+            post_text += "A) Our signature dishes\n"
+            post_text += "B) Try something new each time\n"
+            post_text += "C) The same favorite every time\n\n"
+            post_text += "Comment below! 👇"
+            generation_source = "template"
 
         return {
             "type": "engagement",
@@ -423,7 +507,7 @@ class PostSuggestionService:
             "reason": "Boost engagement and learn customer preferences",
             "hashtags": ["#FoodiePoll", "#CustomerLove", f"#{cuisine}Lovers"],
             "call_to_action": "Tell us in the comments!",
-            "generated_by": "template",
+            "generated_by": generation_source,
         }
 
     async def _create_customer_appreciation_post(
@@ -431,13 +515,28 @@ class PostSuggestionService:
         restaurant_name: str,
         brand_voice: str,
         text_length: str = 'extra_long',
+        use_ai: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """Create a customer appreciation post."""
-        post_text = f"💙 To our amazing customers,\n\n"
-        post_text += f"Thank you for making {restaurant_name} part of your day! "
-        post_text += "Your support means everything to our team.\n\n"
-        post_text += "We're grateful for each and every one of you. "
-        post_text += "Here's to many more delicious moments together! 🍕✨"
+
+        # Use AI if configured
+        if self.openai_api_key and use_ai:
+            post_text, generation_source = await self._generate_post_with_ai(
+                post_type='customer_appreciation',
+                context={
+                    'restaurant_name': restaurant_name,
+                    'brand_voice': brand_voice,
+                },
+                text_length=text_length
+            )
+        else:
+            # Template fallback
+            post_text = f"💙 To our amazing customers,\n\n"
+            post_text += f"Thank you for making {restaurant_name} part of your day! "
+            post_text += "Your support means everything to our team.\n\n"
+            post_text += "We're grateful for each and every one of you. "
+            post_text += "Here's to many more delicious moments together! 🍕✨"
+            generation_source = "template"
 
         return {
             "type": "customer_appreciation",
@@ -449,7 +548,7 @@ class PostSuggestionService:
             "reason": "Build customer loyalty and community",
             "hashtags": ["#ThankYou", "#CustomerAppreciation", "#LocalLove"],
             "call_to_action": "We appreciate you!",
-            "generated_by": "template",
+            "generated_by": generation_source,
         }
 
     async def _generate_post_with_ai(

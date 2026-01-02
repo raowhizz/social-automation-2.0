@@ -1095,3 +1095,41 @@ async def toggle_prompt_preview(
         logger.error(f"Error toggling prompt preview: {e}")
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{tenant_id}/settings/toggle-ai-for-all")
+async def toggle_ai_for_all(
+    tenant_id: str,
+    enabled: bool,
+    db: Session = Depends(get_db),
+):
+    """
+    Toggle the use AI for all posts feature on/off for a tenant.
+    """
+    try:
+        profile = db.query(RestaurantProfile).filter(
+            RestaurantProfile.tenant_id == uuid.UUID(tenant_id)
+        ).first()
+
+        if not profile:
+            # Create profile if doesn't exist
+            profile = RestaurantProfile(
+                tenant_id=uuid.UUID(tenant_id),
+                use_ai_for_all_posts=enabled
+            )
+            db.add(profile)
+        else:
+            profile.use_ai_for_all_posts = enabled
+
+        db.commit()
+
+        return {
+            "success": True,
+            "use_ai_for_all_posts": enabled,
+            "message": f"AI for all posts {'enabled' if enabled else 'disabled'} successfully"
+        }
+
+    except Exception as e:
+        logger.error(f"Error toggling AI for all posts: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
