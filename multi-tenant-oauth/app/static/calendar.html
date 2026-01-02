@@ -957,6 +957,7 @@
             </div>
             <div class="calendar-actions">
                 <button class="btn btn-primary" onclick="showGenerateModal()">Generate Calendar</button>
+                <button class="btn btn-secondary" id="viewLogsBtn" onclick="showProgressModal()" style="display:none;">📊 View Logs</button>
                 <button class="btn btn-danger" id="deleteCalendarBtn" onclick="deleteCurrentCalendar()" style="display:none;">Delete Calendar</button>
                 <button class="btn btn-success" id="approveBtn" onclick="approveCalendar()" style="display:none;">Approve All</button>
             </div>
@@ -1351,6 +1352,9 @@
 
                     // Show action buttons
                     document.getElementById('progressActions').style.display = 'flex';
+
+                    // Show "View Logs" button so user can reopen modal later
+                    document.getElementById('viewLogsBtn').style.display = 'inline-block';
 
                     showMessage(`Calendar generated successfully! ${result.posts.length} posts created.`, 'success');
 
