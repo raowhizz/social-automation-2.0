@@ -665,6 +665,39 @@
             </form>
         </div>
 
+        <!-- Connected Social Accounts Section -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🔗 Connected Social Accounts</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                Connect your Facebook Pages and Instagram Business accounts to start posting to social media
+            </p>
+
+            <div id="accountAlerts"></div>
+
+            <!-- Loading State -->
+            <div id="accountsLoading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading connected accounts...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="accountsEmptyState" style="display: none; text-align: center; padding: 40px 20px; background: #f8f9fa; border-radius: 12px; margin-bottom: 20px;">
+                <div style="font-size: 48px; margin-bottom: 15px;">📱</div>
+                <h3 style="color: #333; margin-bottom: 10px;">No accounts connected yet</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Connect your Facebook Pages to start posting and managing your social media content
+                </p>
+            </div>
+
+            <!-- Connected Accounts List -->
+            <div id="connectedAccountsList" style="margin-bottom: 20px;"></div>
+
+            <!-- Connect New Account Button -->
+            <button class="btn" id="connectFacebookBtn" onclick="connectFacebookAccount()">
+                📘 Connect Facebook Account
+            </button>
+        </div>
+
         <!-- Main Content Grid -->
         <div class="grid-2">
             <!-- Menu Upload Section -->
@@ -1467,7 +1500,193 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             initPromptPreview();
+            loadConnectedAccounts();
+            handleOAuthCallback();
         });
+
+        // ============================================
+        // Social Account Management
+        // ============================================
+
+        async function loadConnectedAccounts() {
+            const loading = document.getElementById('accountsLoading');
+            const emptyState = document.getElementById('accountsEmptyState');
+            const accountsList = document.getElementById('connectedAccountsList');
+
+            loading.style.display = 'block';
+            emptyState.style.display = 'none';
+            accountsList.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/accounts/connected?tenant_id=${TENANT_ID}&platform=facebook`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to load accounts');
+                }
+
+                const accounts = await response.json();
+
+                loading.style.display = 'none';
+
+                if (!accounts || accounts.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                // Render account cards
+                accountsList.innerHTML = accounts.map(account => renderAccountCard(account)).join('');
+            } catch (error) {
+                console.error('Error loading accounts:', error);
+                loading.style.display = 'none';
+                showAlert('accountAlerts', 'error', `❌ Error loading accounts: ${error.message}`);
+            }
+        }
+
+        function renderAccountCard(account) {
+            const statusBadge = getStatusBadge(account);
+            const platformIcon = account.platform === 'facebook' ? '📘' : '📷';
+
+            return `
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 24px;">${platformIcon}</span>
+                                <div>
+                                    <h3 style="margin: 0; color: #333; font-size: 18px;">${account.account_name || 'Facebook Page'}</h3>
+                                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
+                                        ${account.platform_account_id ? `ID: ${account.platform_account_id}` : ''}
+                                    </p>
+                                </div>
+                            </div>
+                            ${statusBadge}
+                            <p style="color: #666; font-size: 13px; margin: 10px 0 0 0;">
+                                Connected: ${new Date(account.created_at).toLocaleDateString()}
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button
+                                class="btn"
+                                onclick="reconnectAccount('${account.id}')"
+                                style="padding: 8px 16px; font-size: 14px; width: auto; margin: 0;">
+                                🔄 Reconnect
+                            </button>
+                            <button
+                                class="btn btn-secondary"
+                                onclick="disconnectAccount('${account.id}')"
+                                style="padding: 8px 16px; font-size: 14px; width: auto; margin: 0; background: #fee2e2; color: #991b1b;">
+                                🗑️ Disconnect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusBadge(account) {
+            // Check token health
+            const now = new Date();
+            const expiresAt = account.token_expires_at ? new Date(account.token_expires_at) : null;
+
+            if (!expiresAt) {
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fef3c7; color: #92400e;">⚠️ Unknown Status</span>`;
+            }
+
+            const daysUntilExpiry = Math.floor((expiresAt - now) / (1000 * 60 * 60 * 24));
+
+            if (daysUntilExpiry < 0) {
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fee2e2; color: #991b1b;">❌ Expired</span>`;
+            } else if (daysUntilExpiry < 7) {
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fef3c7; color: #92400e;">⚠️ Expires in ${daysUntilExpiry} days</span>`;
+            } else {
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #d1fae5; color: #065f46;">✅ Connected (${daysUntilExpiry} days left)</span>`;
+            }
+        }
+
+        async function connectFacebookAccount() {
+            const btn = document.getElementById('connectFacebookBtn');
+            btn.disabled = true;
+            btn.textContent = 'Connecting...';
+
+            try {
+                // Get OAuth authorization URL
+                const response = await fetch(`${API_URL}/api/v1/oauth/facebook/authorize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tenant_id: TENANT_ID,
+                        return_url: `${window.location.origin}/ui/config`
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to initiate OAuth');
+                }
+
+                const data = await response.json();
+
+                // Redirect to Facebook OAuth
+                window.location.href = data.authorization_url;
+            } catch (error) {
+                console.error('Error connecting account:', error);
+                showAlert('accountAlerts', 'error', `❌ Error: ${error.message}`);
+                btn.disabled = false;
+                btn.textContent = '📘 Connect Facebook Account';
+            }
+        }
+
+        async function reconnectAccount(accountId) {
+            // Same as connect, but could include account_id to replace existing
+            connectFacebookAccount();
+        }
+
+        async function disconnectAccount(accountId) {
+            if (!confirm('Are you sure you want to disconnect this account? You will need to reconnect it to continue posting.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/oauth/accounts/${accountId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to disconnect account');
+                }
+
+                showAlert('accountAlerts', 'success', '✅ Account disconnected successfully');
+
+                // Reload accounts list
+                await loadConnectedAccounts();
+            } catch (error) {
+                console.error('Error disconnecting account:', error);
+                showAlert('accountAlerts', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        function handleOAuthCallback() {
+            // Check URL for OAuth callback parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const oauthSuccess = urlParams.get('oauth_success');
+            const oauthError = urlParams.get('oauth_error');
+
+            if (oauthSuccess === 'true') {
+                showAlert('accountAlerts', 'success', '✅ Facebook account connected successfully!');
+
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                // Reload accounts
+                loadConnectedAccounts();
+            } else if (oauthError) {
+                showAlert('accountAlerts', 'error', `❌ OAuth Error: ${decodeURIComponent(oauthError)}`);
+
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
     </script>
 
     <!-- Prompt Preview Modal -->
