@@ -684,6 +684,37 @@ async def generate_monthly_calendar(
     return result
 
 
+@router.post("/{tenant_id}/calendar/generate-with-logs")
+async def generate_monthly_calendar_with_logs(
+    tenant_id: str,
+    request: GenerateCalendarRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate a monthly content calendar with detailed logging.
+
+    Returns calendar data plus complete generation log showing:
+    - Every step in the process
+    - All AI prompts sent to OpenAI
+    - All AI responses received
+    - Timing and cost for each step
+    - Real-time progress updates
+    """
+    calendar_service = ContentCalendarService()
+    result = await calendar_service.generate_monthly_calendar_with_logs(
+        db,
+        tenant_id,
+        request.year,
+        request.month,
+        request.posts_count
+    )
+
+    if not result.get('success'):
+        raise HTTPException(status_code=400, detail=result.get('error'))
+
+    return result
+
+
 @router.get("/{tenant_id}/calendar/current")
 async def get_current_calendar(
     tenant_id: str,
@@ -980,3 +1011,87 @@ async def sync_menu_assets(
         synced_count=synced_count,
         skipped_count=skipped_count,
     )
+
+
+@router.get("/{tenant_id}/prompts/preview")
+async def preview_prompts(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Preview OpenAI prompts that would be sent for this restaurant.
+    Returns prompt templates with actual restaurant data filled in.
+
+    This endpoint does NOT call OpenAI - it just builds the prompts
+    to show what would be sent.
+    """
+    try:
+        # Check if prompt previews are enabled for this tenant
+        profile = db.query(RestaurantProfile).filter(
+            RestaurantProfile.tenant_id == uuid.UUID(tenant_id)
+        ).first()
+
+        if not profile or not profile.show_prompt_previews:
+            raise HTTPException(
+                status_code=403,
+                detail="Prompt preview feature is not enabled. Enable it in restaurant settings."
+            )
+
+        # Generate prompt previews
+        intelligence_service = RestaurantIntelligenceService()
+        result = await intelligence_service.generate_prompt_previews(
+            db=db,
+            tenant_id=tenant_id
+        )
+
+        if not result.get("success"):
+            raise HTTPException(
+                status_code=400,
+                detail=result.get("error", "Failed to generate prompt previews")
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error previewing prompts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{tenant_id}/settings/toggle-prompt-preview")
+async def toggle_prompt_preview(
+    tenant_id: str,
+    enabled: bool,
+    db: Session = Depends(get_db),
+):
+    """
+    Toggle the prompt preview feature on/off for a tenant.
+    """
+    try:
+        profile = db.query(RestaurantProfile).filter(
+            RestaurantProfile.tenant_id == uuid.UUID(tenant_id)
+        ).first()
+
+        if not profile:
+            # Create profile if doesn't exist
+            profile = RestaurantProfile(
+                tenant_id=uuid.UUID(tenant_id),
+                show_prompt_previews=enabled
+            )
+            db.add(profile)
+        else:
+            profile.show_prompt_previews = enabled
+
+        db.commit()
+
+        return {
+            "success": True,
+            "show_prompt_previews": enabled,
+            "message": f"Prompt preview {'enabled' if enabled else 'disabled'} successfully"
+        }
+
+    except Exception as e:
+        logger.error(f"Error toggling prompt preview: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))

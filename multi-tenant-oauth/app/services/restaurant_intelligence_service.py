@@ -674,3 +674,267 @@ Provide ONLY the JSON response, no additional text."""
             "note": "Using template strategy. Configure OPENAI_API_KEY for AI-powered recommendations.",
             "generated_at": datetime.utcnow().isoformat()
         }
+
+    async def generate_prompt_previews(
+        self,
+        db: Session,
+        tenant_id: str,
+    ) -> Dict[str, Any]:
+        """
+        Generate preview of all OpenAI prompts without actually calling the API.
+
+        Args:
+            db: Database session
+            tenant_id: Tenant UUID
+
+        Returns:
+            Dictionary containing all prompt previews with metadata
+        """
+        try:
+            # Get tenant info
+            tenant = db.query(Tenant).filter(Tenant.id == uuid.UUID(tenant_id)).first()
+            if not tenant:
+                return {"success": False, "error": "Tenant not found"}
+
+            # Get menu items
+            menu_items = db.query(MenuItem).filter(
+                MenuItem.tenant_id == uuid.UUID(tenant_id)
+            ).all()
+
+            # Get sales data
+            sales_data = db.query(SalesData).filter(
+                SalesData.tenant_id == uuid.UUID(tenant_id)
+            ).all()
+
+            # Get restaurant profile
+            profile = db.query(RestaurantProfile).filter(
+                RestaurantProfile.tenant_id == uuid.UUID(tenant_id)
+            ).first()
+
+            # Prepare data summaries
+            menu_summary = self._prepare_menu_summary(menu_items) if menu_items else "No menu data imported yet."
+            sales_summary = self._prepare_sales_summary(menu_items, sales_data) if sales_data else "No sales data imported yet."
+
+            # Build all prompts
+            prompts = {}
+
+            # 1. Brand Analysis Prompt
+            brand_prompt = f"""You are a restaurant branding expert. Analyze the following restaurant menu and generate a comprehensive brand personality profile.
+
+Restaurant Name: {tenant.name or 'Unknown'}
+
+Menu Categories and Items:
+{menu_summary}
+
+Based on this menu, provide a detailed analysis in JSON format with the following structure:
+{{
+    "brand_personality": {{
+        "voice_tone": "string describing the brand voice (e.g., 'casual and friendly', 'upscale and sophisticated')",
+        "key_attributes": ["attribute1", "attribute2", "attribute3"],
+        "target_audience": "description of ideal customer",
+        "unique_selling_points": ["usp1", "usp2", "usp3"]
+    }},
+    "cuisine_analysis": {{
+        "primary_cuisine": "main cuisine type",
+        "cuisine_style": "description of style (e.g., 'traditional Italian', 'modern fusion')",
+        "signature_items": ["item1", "item2", "item3"],
+        "price_positioning": "budget/mid-range/premium"
+    }},
+    "content_themes": {{
+        "recommended_themes": ["theme1", "theme2", "theme3"],
+        "hashtag_suggestions": ["#tag1", "#tag2", "#tag3"],
+        "content_pillars": ["pillar1", "pillar2", "pillar3"]
+    }}
+}}
+
+Provide ONLY the JSON response, no additional text."""
+
+            prompts["brand_analysis"] = {
+                "system_message": "You are a restaurant branding expert that provides analysis in JSON format.",
+                "user_prompt": brand_prompt,
+                "model": "gpt-4",
+                "temperature": 0.7,
+                "max_tokens": 1500,
+                "estimated_cost": "$0.045"
+            }
+
+            # 2. Sales Analysis Prompt
+            sales_prompt = f"""You are a restaurant sales analyst. Analyze the following sales data and provide actionable insights for social media marketing.
+
+Sales Summary:
+{sales_summary}
+
+Based on this data, provide insights in JSON format with the following structure:
+{{
+    "sales_patterns": {{
+        "busiest_days": ["day1", "day2"],
+        "slowest_days": ["day1", "day2"],
+        "peak_hours": "description if available",
+        "seasonal_trends": "description of any trends"
+    }},
+    "item_performance": {{
+        "top_sellers": [
+            {{"name": "item name", "times_ordered": number, "insight": "why it's popular"}},
+            ...
+        ],
+        "underperforming_items": [
+            {{"name": "item name", "times_ordered": number, "suggestion": "how to promote"}},
+            ...
+        ]
+    }},
+    "promotional_recommendations": [
+        {{
+            "strategy": "promotion type (e.g., 'Happy Hour', 'Monday Madness')",
+            "target_day": "day of week",
+            "reason": "why this would work",
+            "suggested_discount": "percentage or offer"
+        }},
+        ...
+    ],
+    "content_opportunities": [
+        {{
+            "opportunity": "description",
+            "best_items_to_feature": ["item1", "item2"],
+            "timing": "when to post"
+        }},
+        ...
+    ]
+}}
+
+Provide ONLY the JSON response, no additional text."""
+
+            prompts["sales_analysis"] = {
+                "system_message": "You are a restaurant sales analyst that provides insights in JSON format.",
+                "user_prompt": sales_prompt,
+                "model": "gpt-4",
+                "temperature": 0.7,
+                "max_tokens": 2000,
+                "estimated_cost": "$0.060"
+            }
+
+            # 3. Content Strategy Prompt (only if we have brand analysis)
+            if profile and profile.brand_analysis:
+                brand_summary = json.dumps(profile.brand_analysis, indent=2)
+                sales_summary_json = json.dumps(profile.sales_insights, indent=2) if profile.sales_insights else "No sales data"
+
+                strategy_prompt = f"""You are a social media content strategist for restaurants. Based on the brand analysis and sales insights below, create a comprehensive content strategy.
+
+Brand Analysis:
+{brand_summary}
+
+Sales Insights:
+{sales_summary_json}
+
+Create a content strategy in JSON format with the following structure:
+{{
+    "posting_schedule": {{
+        "frequency": "posts per week",
+        "best_days_to_post": ["day1", "day2"],
+        "best_times": ["time1", "time2"],
+        "rationale": "why this schedule works"
+    }},
+    "content_mix": [
+        {{
+            "content_type": "type (e.g., 'Product Showcase', 'Behind the Scenes')",
+            "percentage": 30,
+            "description": "what to post",
+            "example_topics": ["topic1", "topic2"]
+        }},
+        ...
+    ],
+    "featured_items_rotation": {{
+        "weekly_rotation": ["item1", "item2", "item3"],
+        "strategy": "how to rotate items"
+    }},
+    "promotional_calendar": [
+        {{
+            "week": 1,
+            "focus": "what to promote",
+            "items": ["item1", "item2"],
+            "offer_suggestion": "promotion idea"
+        }},
+        ...
+    ],
+    "engagement_tactics": [
+        {{
+            "tactic": "engagement method",
+            "implementation": "how to do it",
+            "expected_outcome": "what to expect"
+        }},
+        ...
+    ]
+}}
+
+Provide ONLY the JSON response, no additional text."""
+
+                prompts["content_strategy"] = {
+                    "system_message": "You are a social media strategist that provides content strategies in JSON format.",
+                    "user_prompt": strategy_prompt,
+                    "model": "gpt-4",
+                    "temperature": 0.7,
+                    "max_tokens": 2500,
+                    "estimated_cost": "$0.075"
+                }
+
+            # 4. Sample Post Suggestion Prompt
+            post_prompt = f"""You are a social media manager for a restaurant. Create an engaging promotional social media post.
+
+RESTAURANT PROFILE:
+Name: {tenant.name or 'Unknown'}
+Location: {profile.location.get('city', 'N/A') if profile and profile.location else 'N/A'}
+Cuisine: {profile.cuisine_type if profile else 'N/A'}
+Brand Voice: {profile.brand_analysis.get('brand_personality', {}).get('voice_tone', 'friendly and welcoming') if profile and profile.brand_analysis else 'friendly and welcoming'}
+
+MENU HIGHLIGHTS:
+{menu_summary[:500]}...
+
+SALES INSIGHTS:
+{sales_summary[:300] if sales_data else 'No sales data available'}
+
+POST CONTEXT:
+Target day: Monday
+Featured items: Top menu items
+Special promotion: Limited time offer
+
+TARGET AUDIENCE: Local food lovers, families
+
+Write a compelling social media post (2-3 sentences, max 280 characters).
+- Be engaging and authentic
+- Use the specified brand voice
+- Include relevant emojis
+- Reference specific menu items when appropriate
+- Do NOT include hashtags in the post text
+- Keep it concise and impactful"""
+
+            prompts["post_suggestion_sample"] = {
+                "system_message": "You are an expert social media manager specializing in restaurant marketing.",
+                "user_prompt": post_prompt,
+                "model": "gpt-4",
+                "temperature": 0.8,
+                "max_tokens": 400,
+                "estimated_cost": "$0.020"
+            }
+
+            # Restaurant context summary
+            restaurant_context = {
+                "name": tenant.name or 'Not set',
+                "cuisine_type": profile.cuisine_type if profile else 'Not set',
+                "location": profile.location if profile else {},
+                "menu_items_count": len(menu_items),
+                "sales_records_count": len(sales_data),
+                "has_brand_analysis": bool(profile and profile.brand_analysis),
+                "has_sales_insights": bool(profile and profile.sales_insights),
+            }
+
+            return {
+                "success": True,
+                "prompts": prompts,
+                "restaurant_context": restaurant_context,
+            }
+
+        except Exception as e:
+            logger.error(f"Error generating prompt previews: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+            }

@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Index, UniqueConstraint
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Boolean, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -38,6 +38,9 @@ class RestaurantProfile(Base):
     last_sales_import = Column(DateTime)
     menu_items_count = Column(Integer, default=0)
     sales_records_count = Column(Integer, default=0)
+
+    # Feature flags
+    show_prompt_previews = Column(Boolean, default=False, nullable=False)
 
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

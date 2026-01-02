@@ -630,6 +630,281 @@
             color: #666;
             margin-bottom: 20px;
         }
+
+        /* Progress Modal Styles */
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            border-radius: 20px;
+        }
+
+        .progress-bar-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            z-index: 1;
+        }
+
+        .progress-status {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-current {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .status-next {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .generation-steps {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .step-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .step-item.active {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .step-item.completed {
+            border-color: #10b981;
+        }
+
+        .step-item.failed {
+            border-color: #ef4444;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            background: #fafafa;
+            transition: background 0.2s;
+        }
+
+        .step-header:hover {
+            background: #f0f0f0;
+        }
+
+        .step-item.active .step-header {
+            background: #f0f4ff;
+        }
+
+        .step-item.completed .step-header {
+            background: #d1fae5;
+        }
+
+        .step-item.failed .step-header {
+            background: #fee2e2;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .step-status-icon {
+            font-size: 20px;
+        }
+
+        .step-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .step-duration {
+            font-size: 12px;
+            color: #666;
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        .step-body {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .step-body.expanded {
+            display: block;
+        }
+
+        .step-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .step-metadata {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .metadata-item:last-child {
+            border-bottom: none;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .metadata-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .step-request, .step-response {
+            margin-bottom: 15px;
+        }
+
+        .step-section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-code-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .step-toggle-icon {
+            font-size: 12px;
+            color: #999;
+            transition: transform 0.3s;
+        }
+
+        .step-item.expanded .step-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Post generation progress within a step */
+        .posts-progress {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .post-item {
+            padding: 8px 12px;
+            background: white;
+            border-left: 3px solid #10b981;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .post-item.pending {
+            border-left-color: #94a3b8;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -834,9 +1109,45 @@
         </div>
     </div>
 
+    <!-- Calendar Generation Progress Modal -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>🔄 Calendar Generation Progress</h2>
+                <button class="close-btn" onclick="closeProgressModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Progress Bar -->
+                <div class="progress-section">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+                        <div class="progress-bar-text" id="progressBarText">0%</div>
+                    </div>
+                    <div class="progress-status" id="progressStatus">
+                        <div class="status-current" id="statusCurrent">⏳ Initializing...</div>
+                        <div class="status-next" id="statusNext"></div>
+                    </div>
+                </div>
+
+                <!-- Generation Steps -->
+                <div class="generation-steps" id="generationSteps">
+                    <!-- Steps will be dynamically added here -->
+                </div>
+
+                <!-- Actions -->
+                <div class="progress-actions" id="progressActions" style="display: none;">
+                    <button class="btn btn-secondary" onclick="copyGenerationLogs()">📋 Copy Logs</button>
+                    <button class="btn btn-secondary" onclick="downloadGenerationLogs()">💾 Download JSON</button>
+                    <button class="btn btn-primary" onclick="closeProgressModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
         let currentCalendar = null;
+        let generationLog = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -1005,11 +1316,16 @@
         }
 
         async function generateCalendar(month, year, postsCount) {
-            showMessage('Generating calendar with AI... This may take a minute.', 'info');
             closeGenerateModal();
+            showProgressModal();
+
+            // Reset progress
+            updateProgress(0, '⏳ Starting calendar generation...', '');
+            document.getElementById('generationSteps').innerHTML = '';
+            document.getElementById('progressActions').style.display = 'none';
 
             try {
-                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/generate`, {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/generate-with-logs`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1024,17 +1340,31 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showMessage(`Calendar generated successfully! ${result.total_posts} posts created.`, 'success');
+                    // Store generation log
+                    generationLog = result.generation_log;
+
+                    // Display all steps
+                    renderGenerationSteps(result.generation_log);
+
+                    // Update final progress
+                    updateProgress(100, '✅ Calendar generation complete!', '');
+
+                    // Show action buttons
+                    document.getElementById('progressActions').style.display = 'flex';
+
+                    showMessage(`Calendar generated successfully! ${result.posts.length} posts created.`, 'success');
 
                     // Load the newly generated calendar
                     document.getElementById('monthSelect').value = month;
                     document.getElementById('yearSelect').value = year;
                     await loadCalendar();
                 } else {
+                    updateProgress(0, '❌ Calendar generation failed', '');
                     showMessage(result.error || 'Failed to generate calendar.', 'error');
                 }
             } catch (error) {
                 console.error('Error generating calendar:', error);
+                updateProgress(0, '❌ Calendar generation failed', '');
                 showMessage('Failed to generate calendar. Please try again.', 'error');
             }
         }
@@ -1408,6 +1738,234 @@
 
         // Initialize posts array
         window.calendarPosts = [];
+
+        // Progress Modal Functions
+        function showProgressModal() {
+            document.getElementById('progressModal').classList.add('active');
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.remove('active');
+        }
+
+        function updateProgress(percentage, currentStatus, nextStatus) {
+            const progressBarFill = document.getElementById('progressBarFill');
+            const progressBarText = document.getElementById('progressBarText');
+            const statusCurrent = document.getElementById('statusCurrent');
+            const statusNext = document.getElementById('statusNext');
+
+            progressBarFill.style.width = percentage + '%';
+            progressBarText.textContent = Math.round(percentage) + '%';
+            statusCurrent.textContent = currentStatus;
+            statusNext.textContent = nextStatus || '';
+        }
+
+        function renderGenerationSteps(generationLog) {
+            const stepsContainer = document.getElementById('generationSteps');
+            stepsContainer.innerHTML = '';
+
+            if (!generationLog || !generationLog.steps) {
+                return;
+            }
+
+            const totalSteps = generationLog.steps.length;
+
+            generationLog.steps.forEach((step, index) => {
+                const stepItem = document.createElement('div');
+                stepItem.className = `step-item ${step.status}`;
+                stepItem.id = `step-${step.step_number}`;
+
+                // Determine status icon
+                let statusIcon = '⏳';
+                if (step.status === 'completed') statusIcon = '✅';
+                else if (step.status === 'failed') statusIcon = '❌';
+                else if (step.status === 'active') statusIcon = '🔄';
+
+                // Format duration
+                const duration = step.duration_ms ? `${step.duration_ms}ms` : '-';
+
+                // Build step HTML
+                let stepHTML = `
+                    <div class="step-header" onclick="toggleStep(${step.step_number})">
+                        <div class="step-title">
+                            <span class="step-status-icon">${statusIcon}</span>
+                            <span class="step-name">${step.name}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="step-duration">${duration}</span>
+                            <span class="step-toggle-icon">▼</span>
+                        </div>
+                    </div>
+                    <div class="step-body" id="step-body-${step.step_number}">
+                        <div class="step-description">${step.description}</div>
+                `;
+
+                // Add metadata if present
+                if (step.metadata && Object.keys(step.metadata).length > 0) {
+                    stepHTML += '<div class="step-metadata">';
+
+                    // Show current_status and next_status prominently if they exist
+                    if (step.metadata.current_status) {
+                        stepHTML += `
+                            <div class="metadata-item">
+                                <span class="metadata-label">Current Status:</span>
+                                <span class="metadata-value">${step.metadata.current_status}</span>
+                            </div>
+                        `;
+                    }
+                    if (step.metadata.next_status) {
+                        stepHTML += `
+                            <div class="metadata-item">
+                                <span class="metadata-label">Next:</span>
+                                <span class="metadata-value">${step.metadata.next_status}</span>
+                            </div>
+                        `;
+                    }
+
+                    // Show post generation progress if available
+                    const postKeys = Object.keys(step.metadata).filter(k => k.startsWith('post_'));
+                    if (postKeys.length > 0) {
+                        stepHTML += '</div><div class="posts-progress">';
+                        stepHTML += '<div class="step-section-title">📝 Generated Posts</div>';
+
+                        postKeys.forEach(postKey => {
+                            const postData = step.metadata[postKey];
+                            if (postData && postData.date) {
+                                stepHTML += `
+                                    <div class="post-item ${postData.status === '✓ Generated' ? '' : 'pending'}">
+                                        ${postData.status} - ${postData.date}: ${postData.caption_preview || 'Post'}
+                                    </div>
+                                `;
+                            }
+                        });
+                    } else {
+                        // Show other metadata
+                        Object.keys(step.metadata).forEach(key => {
+                            if (key !== 'current_status' && key !== 'next_status') {
+                                const value = typeof step.metadata[key] === 'object'
+                                    ? JSON.stringify(step.metadata[key], null, 2)
+                                    : step.metadata[key];
+                                stepHTML += `
+                                    <div class="metadata-item">
+                                        <span class="metadata-label">${key}:</span>
+                                        <span class="metadata-value">${value}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                    }
+
+                    stepHTML += '</div>';
+                }
+
+                // Add request/response if present
+                if (step.request) {
+                    stepHTML += `
+                        <div class="step-request">
+                            <div class="step-section-title">📤 Request</div>
+                            <div class="code-block">
+                                <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(step.request))})">📋 Copy</button>
+                                <pre>${JSON.stringify(step.request, null, 2)}</pre>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (step.response) {
+                    stepHTML += `
+                        <div class="step-response">
+                            <div class="step-section-title">📥 Response</div>
+                            <div class="code-block">
+                                <button class="copy-code-btn" onclick="copyCode(this, ${JSON.stringify(JSON.stringify(step.response))})">📋 Copy</button>
+                                <pre>${JSON.stringify(step.response, null, 2)}</pre>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Add error if present
+                if (step.error) {
+                    stepHTML += `
+                        <div class="step-error" style="background: #fee2e2; padding: 15px; border-radius: 8px; color: #991b1b;">
+                            <div class="step-section-title" style="color: #991b1b;">❌ Error</div>
+                            <pre style="margin: 0; white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px;">${step.error}</pre>
+                        </div>
+                    `;
+                }
+
+                stepHTML += '</div>';
+
+                stepItem.innerHTML = stepHTML;
+                stepsContainer.appendChild(stepItem);
+
+                // Calculate and update overall progress
+                const completedSteps = index + (step.status === 'completed' ? 1 : 0);
+                const progressPercentage = (completedSteps / totalSteps) * 100;
+
+                // Update progress with current status from metadata
+                const currentStatus = step.metadata?.current_status || step.description;
+                const nextStatus = step.metadata?.next_status || '';
+                updateProgress(progressPercentage, currentStatus, nextStatus);
+            });
+        }
+
+        function toggleStep(stepNumber) {
+            const stepItem = document.getElementById(`step-${stepNumber}`);
+            const stepBody = document.getElementById(`step-body-${stepNumber}`);
+
+            if (stepItem && stepBody) {
+                stepItem.classList.toggle('expanded');
+                stepBody.classList.toggle('expanded');
+            }
+        }
+
+        function copyCode(button, code) {
+            const text = JSON.parse(code);
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        function copyGenerationLogs() {
+            if (!generationLog) {
+                showMessage('No generation logs available to copy.', 'error');
+                return;
+            }
+
+            const logsText = JSON.stringify(generationLog, null, 2);
+            navigator.clipboard.writeText(logsText).then(() => {
+                showMessage('Generation logs copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy logs:', err);
+                showMessage('Failed to copy logs. Please try again.', 'error');
+            });
+        }
+
+        function downloadGenerationLogs() {
+            if (!generationLog) {
+                showMessage('No generation logs available to download.', 'error');
+                return;
+            }
+
+            const logsText = JSON.stringify(generationLog, null, 2);
+            const blob = new Blob([logsText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `calendar-generation-logs-${new Date().toISOString()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showMessage('Generation logs downloaded!', 'success');
+        }
     </script>
 </body>
 </html>
