@@ -1,0 +1,15 @@
+{
+  "posted_at": "20251117_012125",
+  "campaign": "Weekend Special",
+  "results": [
+    {
+      "item": "Carnivore Pizza",
+      "results": {
+        "facebook": {
+          "success": false,
+          "error": "403 Client Error: Forbidden for url: https://graph.facebook.com/v18.0/802786652928846/photos?access_token=EAAJ5haRCYbABPyT5BZA36mzlkNKc3dioz3jijwQbubXKN8S6wck4QVSJwEcPEbviJDa9ZCD5pwZCLGpqzEAuxwxWxvgrhHywQ1Gm8LHZCZCBQ2ZBDjnIXPY3InUELaXiEkB6ziua42ZAUCuyZCxyDg8QPp5wBg1feeNvZB78jwROLOkyMuSal0W3ezuh9T8M2TRfOzkerZCBnfFtChuWzZAp0HGKZA6RwUtwZCaItbfV8420ZD&message=Wave+goodbye+to+the+week+and+hello+to+weekend+indulgence+with+Krusty+Pizza+%26+Pasta%21+%F0%9F%8D%95%E2%9C%A8+Dive+into+our+weekend+vibes+with+the+ultimate+comfort+food%3A+The+Carnivore+Pizza.+Loaded+with+red+sauce%2C+beef+salami%2C+turkey+ham%2C+beef+pepperoni%2C+ground+beef%2C+beef+Italian+sausage%2C+turkey+bacon%2C+and+chicken%2C+it%27s+the+perfect+treat+to+pamper+your+taste+buds+and+make+your+weekend+special.+Whether+you%27re+planning+a+cozy+night+in+or+looking+for+the+perfect+centerpiece+for+your+party%2C+our+Carnivore+Pizza+promises+bold+flavors+and+big+portions%2C+making+every+bite+an+adventure.+Don%27t+let+the+weekend+pass+by+without+treating+yourself+to+a+slice+%28or+two%21%29+of+mouthwatering+perfection.+Order+now+and+make+it+a+deliciously+unforgettable+weekend+with+Krusty+Pizza+%26+Pasta.+Your+neighborhood+pizza+destination+awaits%21+%F0%9F%8E%89%F0%9F%8D%B4+%23MakeItDelicious+%23WeekendVibes%0A%0A"
+        }
+      }
+    }
+  ]
+}

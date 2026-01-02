@@ -1,0 +1,34 @@
+{
+  "restaurant": "krusti_pizza_and_pasta",
+  "campaign": {
+    "name": "Weekend Special",
+    "description": "Weekend vibes call for delicious food! Check out our weekend favorites.",
+    "start_date": "2025-11-21T17:00:00.532764",
+    "end_date": "2025-11-23T23:59:59.532764",
+    "theme": "Relaxation, Indulgence, Weekend Vibes",
+    "keywords": [
+      "Weekend plans? We've got you covered",
+      "Perfect for a relaxing weekend",
+      "Treat yourself this weekend",
+      "Weekend favorites",
+      "Make it a delicious weekend"
+    ],
+    "target_items": []
+  },
+  "generated_at": "20251117_013355",
+  "items": [
+    {
+      "item_name": "Carnivore Pizza",
+      "original_image": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/data/restaurants/krusti_pizza_and_pasta/images/carnivore_pizza.jpg",
+      "image_analysis": "I'm unable to analyze the image itself, but I can help you craft a social media-friendly description based on the information you've provided about the Carnivore Pizza.\n\n1. **Visual Appeal Description**:\n   - **Colors**: Likely a rich mix of reds and browns from the meats, contrasted with golden brown crust.\n   - **Presentation**: Heavily topped with a variety of meats for a hearty look.\n   - **Plating**: Could be served on a rustic wooden board for a classic presentation.\n\n2. **Key Ingredients Visible**:\n   - Beef salami, turkey ham, beef pepperoni, ground beef, Italian sausage, turkey bacon, chicken, and red sauce.\n\n3. **What Makes This Dish Look Appetizing**:\n   - The abundance of meat provides a robust and satisfying look.\n   - The contrast of red sauce and varied meat textures offers visual interest and promises rich flavors.\n\n4. **Suggested Emotional Appeal**:\n   - **Indulgence**: Perfect for a treat-yourself moment or sharing with friends during a party.\n   - **Comfort**: The hearty toppings and savory flavors evoke a sense of homely comfort.\n\n5. **Best Angle/Composition Notes**:\n   - A slightly overhead angle captures the pizza\u2019s toppings in full detail.\n   - Close-up shots can emphasize the texture and variety of meats, appealing to meat lovers.\n\nFor social media, focusing on the indulgence and variety of meats can attract those looking to treat themselves or enjoy a hearty meal.",
+      "platforms": {
+        "facebook": {
+          "caption": "Weekend vibes are better with flavors that delight and satisfy! \ud83c\udf55\ud83c\udf89 Dive into the ultimate indulgence with our Carnivore Pizza, a meat lover's paradise packed with beef salami, turkey ham, beef pepperoni, ground beef, Italian sausage, turkey bacon, and chicken, all layered on our signature red sauce. It's the perfect pick to elevate your relaxation and treat yourself to the bold, satisfying flavors you deserve. \ud83d\ude0d Make this weekend memorable by gathering around a Krusty Pizza & Pasta specialty. Whether you're celebrating a special occasion or simply embracing the weekend vibes, we've got you covered with our mouthwatering selections. Don't wait, make it a deliciously unforgettable weekend with us. Order now and let the feasting begin! \ud83d\udcf2\ud83d\udef5\n#KrustyPizzaAndPasta #CarnivorePizza #WeekendVibes #MeatLoversUnite #PizzaParty #IndulgeYourself #FamilyDinnerGoals #TreatYourselfWeekend\nSHORT TEXT OVERLAY:\n\"Meat Feast\"",
+          "hashtags": "",
+          "full_post": "Weekend vibes are better with flavors that delight and satisfy! \ud83c\udf55\ud83c\udf89 Dive into the ultimate indulgence with our Carnivore Pizza, a meat lover's paradise packed with beef salami, turkey ham, beef pepperoni, ground beef, Italian sausage, turkey bacon, and chicken, all layered on our signature red sauce. It's the perfect pick to elevate your relaxation and treat yourself to the bold, satisfying flavors you deserve. \ud83d\ude0d Make this weekend memorable by gathering around a Krusty Pizza & Pasta specialty. Whether you're celebrating a special occasion or simply embracing the weekend vibes, we've got you covered with our mouthwatering selections. Don't wait, make it a deliciously unforgettable weekend with us. Order now and let the feasting begin! \ud83d\udcf2\ud83d\udef5\n#KrustyPizzaAndPasta #CarnivorePizza #WeekendVibes #MeatLoversUnite #PizzaParty #IndulgeYourself #FamilyDinnerGoals #TreatYourselfWeekend\nSHORT TEXT OVERLAY:\n\"Meat Feast\"\n\n",
+          "image_path": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/output/krusti_pizza_and_pasta/generated_content/carnivore_pizza_overlay_20251117_013355_facebook_20251117_013355.jpg"
+        }
+      }
+    }
+  ]
+}

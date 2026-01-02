@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - Restaurant Social Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Radio Button Groups */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .radio-group label:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"]:checked + span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .radio-group label:has(input:checked) {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .variation-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .variation-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .variation-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .variation-text {
+            white-space: pre-wrap;
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .similarity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .similarity-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .similarity-medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .similarity-high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .history-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-platform {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .history-caption {
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Asset Picker Modal */
+        .asset-picker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .asset-picker-modal.active {
+            display: flex;
+        }
+
+        .asset-picker-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asset-picker-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-picker-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .close-modal-btn:hover {
+            background: #f5f7fa;
+        }
+
+        .asset-picker-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .asset-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .asset-picker-item {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .asset-picker-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .asset-picker-item.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .asset-picker-thumbnail {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .asset-picker-info {
+            padding: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .asset-picker-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-brand">🍕 Restaurant Social Automation</div>
+        <div class="navbar-menu">
+            <a href="/ui" class="nav-link">Dashboard</a>
+            <a href="/ui/suggestions" class="nav-link">Post Ideas</a>
+            <a href="/ui/calendar" class="nav-link">Calendar</a>
+            <a href="/ui/create" class="nav-link active">Create Post</a>
+            <a href="/ui/config" class="nav-link">Config</a>
+            <a href="/ui/assets" class="nav-link">Assets</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Create Social Media Post</h1>
+            <p class="subtitle" id="restaurant-name">Loading...</p>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-published">0</div>
+                    <div class="stat-label">Published</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-failed">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column - Create Post -->
+            <div class="card">
+                <h2>Create New Post</h2>
+
+                <div class="error" id="error-message"></div>
+                <div class="success" id="success-message"></div>
+
+                <!-- Form -->
+                <form id="post-form">
+                    <!-- Mode Switcher -->
+                    <div class="form-group">
+                        <label>Create Mode</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="createMode" value="manual" id="mode-manual">
+                                <span>Create Manual Post</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="createMode" value="ai" id="mode-ai" checked>
+                                <span>Generate Post Ideas (AI)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Scheduling Section -->
+                    <div class="form-group">
+                        <label>Publishing</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="publishMode" value="now" id="publish-now" checked>
+                                <span>Post Now</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="publishMode" value="schedule" id="publish-schedule">
+                                <span>Schedule for Later</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Scheduling Fields (hidden by default) -->
+                    <div id="schedulingFields" class="form-group" style="display: none;">
+                        <label>Schedule Date & Time</label>
+                        <div class="form-row">
+                            <div>
+                                <input type="date" id="scheduleDate" placeholder="Select date">
+                            </div>
+                            <div>
+                                <input type="time" id="scheduleTime" value="12:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Post Text (hidden by default) -->
+                    <div id="manualPostFields" class="form-group" style="display: none;">
+                        <label>Post Caption</label>
+                        <textarea id="manualPostText" placeholder="Write your post caption here..." style="min-height: 120px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Post Type</label>
+                        <select id="post-type">
+                            <option value="daily_special">Daily Special</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="event">Event</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="holiday">Holiday</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Name (Optional)</label>
+                        <input type="text" id="item-name" placeholder="e.g., Margherita Pizza">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description (Optional)</label>
+                        <textarea id="item-description" placeholder="Describe your special offer, item, or event..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image (Optional)</label>
+                        <div id="image-selection" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" onclick="openAssetPicker()" style="flex: 1;">
+                                    Browse Asset Library
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('quick-upload').click()" style="flex: 1;">
+                                    Quick Upload
+                                </button>
+                                <input type="file" id="quick-upload" accept="image/*" style="display: none;" onchange="handleQuickUpload(event)">
+                            </div>
+                            <div id="selected-image-preview" style="display: none; position: relative;">
+                                <img id="preview-thumbnail" src="" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
+                                <button type="button" onclick="clearSelectedImage()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px;">×</button>
+                                <div id="image-info" style="margin-top: 8px; font-size: 12px; color: #666;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tone</label>
+                        <select id="tone">
+                            <option value="friendly">Friendly</option>
+                            <option value="professional">Professional</option>
+                            <option value="casual">Casual</option>
+                            <option value="exciting">Exciting</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Platform</label>
+                        <select id="platform">
+                            <option value="facebook">Facebook</option>
+                            <option value="instagram">Instagram</option>
+                        </select>
+                    </div>
+
+                    <!-- Text Length -->
+                    <div class="form-group">
+                        <label for="textLength">
+                            <i class="fas fa-text-height"></i> Post Length
+                            <span style="font-size: 0.85em; color: #6c757d;">(Text amount in AI-generated posts)</span>
+                        </label>
+                        <select class="form-control" id="textLength" name="text_length">
+                            <option value="short">Short (1-2 sentences, ~150 chars)</option>
+                            <option value="medium">Medium (2-3 sentences, ~280 chars)</option>
+                            <option value="long">Long (3-5 sentences, ~500 chars)</option>
+                            <option value="extra_long" selected>Extra Long (5-8 sentences, ~800 chars)</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            Choose how much text to generate in AI posts. Shorter posts are punchier, longer posts provide more detail.
+                        </small>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                        Generate Post Ideas
+                    </button>
+                </form>
+
+                <!-- Generated Variations -->
+                <div id="variations-container" style="margin-top: 30px; display: none;">
+                    <h3 style="margin-bottom: 15px; color: #333;">Select Your Favorite:</h3>
+                    <div id="variations-list"></div>
+
+                    <button id="publish-btn" class="btn btn-success btn-block" style="margin-top: 15px;">
+                        Publish Selected Post
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column - History -->
+            <div class="card">
+                <h2>Recent Posts</h2>
+                <div id="history-container">
+                    <div class="loading">Loading history...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:8000/api/v1';
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Krusty Pizza
+        const RESTAURANT_NAME = 'Krusty Pizza & Pasta';
+        const RESTAURANT_DESCRIPTION = 'Fresh authentic Italian pizza and pasta made with love';
+
+        let selectedVariation = null;
+        let variations = [];
+
+        // Load date from URL parameter
+        function loadDateFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+
+            if (!dateParam) return;
+
+            try {
+                // Switch to manual mode
+                document.getElementById('mode-manual').checked = true;
+
+                // Switch to schedule mode
+                document.getElementById('publish-schedule').checked = true;
+
+                // Set the date
+                document.getElementById('scheduleDate').value = dateParam;
+
+                // Show scheduling fields
+                document.getElementById('schedulingFields').style.display = 'block';
+
+                // Show manual post fields
+                document.getElementById('manualPostFields').style.display = 'block';
+
+                // Update button text
+                updateSubmitButton();
+
+                showSuccess(`Scheduling post for ${dateParam}`);
+            } catch (error) {
+                console.error('Error loading date from URL:', error);
+            }
+        }
+
+        // Setup mode switchers
+        function setupModeSwitchers() {
+            // Create mode switcher
+            document.querySelectorAll('input[name="createMode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const isManual = e.target.value === 'manual';
+                    document.getElementById('manualPostFields').style.display = isManual ? 'block' : 'none';
+                    updateSubmitButton();
+                });
+            });
+
+            // Publish mode switcher
+            document.querySelectorAll('input[name="publishMode"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const isSchedule = e.target.value === 'schedule';
+                    document.getElementById('schedulingFields').style.display = isSchedule ? 'block' : 'none';
+
+                    // Set default date to today if not already set
+                    if (isSchedule && !document.getElementById('scheduleDate').value) {
+                        const today = new Date().toISOString().split('T')[0];
+                        document.getElementById('scheduleDate').value = today;
+                    }
+
+                    updateSubmitButton();
+                });
+            });
+        }
+
+        // Update submit button text based on mode
+        function updateSubmitButton() {
+            const isManual = document.getElementById('mode-manual').checked;
+            const isSchedule = document.getElementById('publish-schedule').checked;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (isManual) {
+                if (isSchedule) {
+                    submitBtn.textContent = 'Schedule Post';
+                } else {
+                    submitBtn.textContent = 'Publish Now';
+                }
+            } else {
+                if (isSchedule) {
+                    submitBtn.textContent = 'Generate & Schedule';
+                } else {
+                    submitBtn.textContent = 'Generate Post Ideas';
+                }
+            }
+        }
+
+        // Load suggestion from URL parameter
+        function loadSuggestionFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const suggestionNum = urlParams.get('suggestion');
+
+            if (!suggestionNum) return;
+
+            try {
+                // Get suggestions from localStorage
+                const suggestionsJSON = localStorage.getItem('postSuggestions');
+                if (!suggestionsJSON) {
+                    console.warn('No suggestions found in localStorage');
+                    return;
+                }
+
+                const suggestions = JSON.parse(suggestionsJSON);
+                const suggestionIndex = parseInt(suggestionNum) - 1;
+
+                if (suggestionIndex < 0 || suggestionIndex >= suggestions.length) {
+                    console.warn(`Invalid suggestion number: ${suggestionNum}`);
+                    return;
+                }
+
+                const suggestion = suggestions[suggestionIndex];
+
+                // Pre-fill form with suggestion data
+                document.getElementById('item-name').value = suggestion.title || '';
+                document.getElementById('item-description').value = suggestion.post_text || '';
+
+                // Set post type based on suggestion type
+                const typeMap = {
+                    'promotional': 'promotional',
+                    'product_showcase': 'product',
+                    'seasonal': 'seasonal',
+                    'engagement': 'engagement'
+                };
+                const postType = typeMap[suggestion.type] || 'promotional';
+                document.getElementById('post-type').value = postType;
+
+                // Show success message
+                showSuccess(`Loaded suggestion: "${suggestion.title}"`);
+            } catch (error) {
+                console.error('Error loading suggestion:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadHistory();
+            document.getElementById('restaurant-name').textContent = RESTAURANT_NAME;
+
+            // Check if we're loading a suggestion from the URL
+            loadSuggestionFromURL();
+
+            // Check if we're loading a date from the URL
+            loadDateFromURL();
+
+            // Setup mode switcher event listeners
+            setupModeSwitchers();
+        });
+
+        // Form submission
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const isManual = document.getElementById('mode-manual').checked;
+            const isSchedule = document.getElementById('publish-schedule').checked;
+
+            if (isManual) {
+                // Manual mode
+                if (isSchedule) {
+                    await scheduleManualPost();
+                } else {
+                    await publishManualPost();
+                }
+            } else {
+                // AI mode
+                await generateVariations();
+            }
+        });
+
+        // Publish button (for AI-generated posts)
+        document.getElementById('publish-btn').addEventListener('click', async () => {
+            if (selectedVariation !== null) {
+                const isSchedule = document.getElementById('publish-schedule').checked;
+                if (isSchedule) {
+                    await scheduleAIPost(variations[selectedVariation]);
+                } else {
+                    await publishPost(variations[selectedVariation]);
+                }
+            }
+        });
+
+        // Generate content variations
+        async function generateVariations() {
+            try {
+                const postType = document.getElementById('post-type').value;
+                const itemName = document.getElementById('item-name').value;
+                const itemDescription = document.getElementById('item-description').value;
+                const tone = document.getElementById('tone').value;
+                const platform = document.getElementById('platform').value;
+                const textLength = document.getElementById('textLength').value;
+
+                showError('');
+                showSuccess('');
+
+                const response = await fetch(`${API_BASE}/posts/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tenant_id: TENANT_ID,
+                        restaurant_name: RESTAURANT_NAME,
+                        restaurant_description: RESTAURANT_DESCRIPTION,
+                        post_type: postType,
+                        item_name: itemName || null,
+                        item_description: itemDescription || null,
+                        tone: tone,
+                        platform: platform,
+                        num_variations: 3,
+                        text_length: textLength
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate variations');
+                }
+
+                const data = await response.json();
+                variations = data.variations;
+                displayVariations(data.variations, data.similarity_scores);
+
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            }
+        }
+
+        // Display variations
+        function displayVariations(variations, scores) {
+            const container = document.getElementById('variations-list');
+            container.innerHTML = '';
+
+            variations.forEach((variation, index) => {
+                const card = document.createElement('div');
+                card.className = 'variation-card';
+                card.onclick = () => selectVariation(index);
+
+                const score = scores[index];
+                let badgeClass = 'similarity-low';
+                let badgeText = 'Original';
+
+                if (score > 0.5) {
+                    badgeClass = 'similarity-high';
+                    badgeText = 'Similar to recent';
+                } else if (score > 0.3) {
+                    badgeClass = 'similarity-medium';
+                    badgeText = 'Somewhat similar';
+                }
+
+                card.innerHTML = `
+                    <div class="variation-text">${variation}</div>
+                    <span class="similarity-badge ${badgeClass}">${badgeText} (${(score * 100).toFixed(0)}%)</span>
+                `;
+
+                container.appendChild(card);
+            });
+
+            document.getElementById('variations-container').style.display = 'block';
+            selectedVariation = 0;
+            selectVariation(0);
+        }
+
+        // Select variation
+        function selectVariation(index) {
+            selectedVariation = index;
+            const cards = document.querySelectorAll('.variation-card');
+            cards.forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+        }
+
+        // Publish post (AI-generated, immediate)
+        async function publishPost(caption) {
+            try {
+                const platform = document.getElementById('platform').value;
+                const textLength = document.getElementById('textLength').value;
+                const itemName = document.getElementById('item-name').value;
+
+                const requestBody = {
+                    tenant_id: TENANT_ID,
+                    platform: platform,
+                    caption: caption,
+                    item_name: itemName || null,
+                    publish_now: true
+                };
+
+                // Include asset_id if an image is selected
+                if (selectedAssetId) {
+                    requestBody.asset_id = selectedAssetId;
+                }
+
+                const response = await fetch(`${API_BASE}/posts/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to publish post');
+                }
+
+                const result = await response.json();
+                showSuccess(`Post published successfully! Post ID: ${result.platform_post_id}`);
+
+                // Reset form and reload
+                resetForm();
+                loadStats();
+                loadHistory();
+
+            } catch (error) {
+                showError(`Publishing error: ${error.message}`);
+            }
+        }
+
+        // Publish manual post immediately
+        async function publishManualPost() {
+            try {
+                const caption = document.getElementById('manualPostText').value.trim();
+                if (!caption) {
+                    showError('Please enter post text');
+                    return;
+                }
+
+                const platform = document.getElementById('platform').value;
+                const textLength = document.getElementById('textLength').value;
+                const requestBody = {
+                    tenant_id: TENANT_ID,
+                    platform: platform,
+                    caption: caption,
+                    publish_now: true
+                };
+
+                // Include asset_id if an image is selected
+                if (selectedAssetId) {
+                    requestBody.asset_id = selectedAssetId;
+                }
+
+                const response = await fetch(`${API_BASE}/posts/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to publish post');
+                }
+
+                const result = await response.json();
+                showSuccess(`Post published successfully! Post ID: ${result.platform_post_id}`);
+
+                // Reset form and reload
+                resetForm();
+                loadStats();
+                loadHistory();
+
+            } catch (error) {
+                showError(`Publishing error: ${error.message}`);
+            }
+        }
+
+        // Schedule manual post
+        async function scheduleManualPost() {
+            try {
+                const caption = document.getElementById('manualPostText').value.trim();
+                const scheduleDate = document.getElementById('scheduleDate').value;
+                const scheduleTime = document.getElementById('scheduleTime').value;
+
+                if (!caption) {
+                    showError('Please enter post text');
+                    return;
+                }
+
+                if (!scheduleDate || !scheduleTime) {
+                    showError('Please select date and time');
+                    return;
+                }
+
+                // Get or create current calendar
+                const calendar = await getCurrentCalendar();
+                if (!calendar) {
+                    showError('Failed to get calendar');
+                    return;
+                }
+
+                const platform = document.getElementById('platform').value;
+                const textLength = document.getElementById('textLength').value;
+                const postType = document.getElementById('post-type').value;
+
+                const requestBody = {
+                    calendar_id: calendar.id,
+                    title: `Manual Post - ${postType}`,
+                    post_text: caption,
+                    scheduled_date: scheduleDate,
+                    scheduled_time: scheduleTime,
+                    platform: platform,
+                    post_type: postType,
+                    status: 'draft'
+                };
+
+                // Include image URL if an asset is selected
+                if (selectedAssetUrl) {
+                    requestBody.image_url = selectedAssetUrl;
+                }
+
+                const response = await fetch(`${API_BASE}/restaurant/${TENANT_ID}/calendar/post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to schedule post');
+                }
+
+                const result = await response.json();
+                showSuccess(`Post scheduled for ${scheduleDate} at ${scheduleTime}! View it in the calendar.`);
+
+                // Reset form
+                resetForm();
+
+            } catch (error) {
+                showError(`Scheduling error: ${error.message}`);
+            }
+        }
+
+        // Schedule AI-generated post
+        async function scheduleAIPost(caption) {
+            try {
+                const scheduleDate = document.getElementById('scheduleDate').value;
+                const scheduleTime = document.getElementById('scheduleTime').value;
+
+                if (!scheduleDate || !scheduleTime) {
+                    showError('Please select date and time');
+                    return;
+                }
+
+                // Get or create current calendar
+                const calendar = await getCurrentCalendar();
+                if (!calendar) {
+                    showError('Failed to get calendar');
+                    return;
+                }
+
+                const platform = document.getElementById('platform').value;
+                const textLength = document.getElementById('textLength').value;
+                const postType = document.getElementById('post-type').value;
+                const itemName = document.getElementById('item-name').value;
+
+                const requestBody = {
+                    calendar_id: calendar.id,
+                    title: itemName || `AI Post - ${postType}`,
+                    post_text: caption,
+                    scheduled_date: scheduleDate,
+                    scheduled_time: scheduleTime,
+                    platform: platform,
+                    post_type: postType,
+                    status: 'draft'
+                };
+
+                // Include image URL if an asset is selected
+                if (selectedAssetUrl) {
+                    requestBody.image_url = selectedAssetUrl;
+                }
+
+                const response = await fetch(`${API_BASE}/restaurant/${TENANT_ID}/calendar/post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to schedule post');
+                }
+
+                const result = await response.json();
+                showSuccess(`Post scheduled for ${scheduleDate} at ${scheduleTime}! View it in the calendar.`);
+
+                // Reset form
+                resetForm();
+
+            } catch (error) {
+                showError(`Scheduling error: ${error.message}`);
+            }
+        }
+
+        // Get or create current calendar
+        async function getCurrentCalendar() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurant/${TENANT_ID}/calendar/current`);
+                if (!response.ok) {
+                    throw new Error('Failed to get calendar');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error getting calendar:', error);
+                return null;
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('post-form').reset();
+            document.getElementById('variations-container').style.display = 'none';
+            document.getElementById('schedulingFields').style.display = 'none';
+            document.getElementById('manualPostFields').style.display = 'none';
+            selectedVariation = null;
+            variations = [];
+            clearSelectedImage();
+
+            // Reset to AI mode and Post Now
+            document.getElementById('mode-ai').checked = true;
+            document.getElementById('publish-now').checked = true;
+            updateSubmitButton();
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/posts/stats?tenant_id=${TENANT_ID}&days=30`);
+                const stats = await response.json();
+
+                document.getElementById('stat-total').textContent = stats.total_posts;
+                document.getElementById('stat-published').textContent = stats.published;
+                document.getElementById('stat-failed').textContent = stats.failed;
+                document.getElementById('stat-pending').textContent = stats.pending;
+
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load history
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/posts/history?tenant_id=${TENANT_ID}&days=30&limit=10`);
+                const posts = await response.json();
+
+                const container = document.getElementById('history-container');
+                container.innerHTML = '';
+
+                if (posts.length === 0) {
+                    container.innerHTML = '<div class="loading">No posts yet</div>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+
+                    const date = new Date(post.posted_at || post.created_at);
+                    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+                    let statusClass = 'status-pending';
+                    if (post.status === 'published') statusClass = 'status-published';
+                    if (post.status === 'failed') statusClass = 'status-failed';
+
+                    item.innerHTML = `
+                        <div class="history-meta">
+                            <span class="history-platform">${post.platform}</span>
+                            <span class="history-date">${dateStr}</span>
+                        </div>
+                        <div class="history-caption">${post.caption}</div>
+                        <span class="status-badge ${statusClass}">${post.status}</span>
+                    `;
+
+                    container.appendChild(item);
+                });
+
+            } catch (error) {
+                document.getElementById('history-container').innerHTML =
+                    '<div class="loading">Failed to load history</div>';
+            }
+        }
+
+        // Helper functions
+        function showError(message) {
+            const el = document.getElementById('error-message');
+            el.textContent = message;
+            el.style.display = message ? 'block' : 'none';
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('success-message');
+            el.textContent = message;
+            el.style.display = message ? 'block' : 'none';
+
+            if (message) {
+                setTimeout(() => showSuccess(''), 5000);
+            }
+        }
+
+        // Asset Picker Variables
+        let selectedAssetId = null;
+        let selectedAssetUrl = null;
+        let pickerAssets = [];
+
+        // Open Asset Picker
+        async function openAssetPicker() {
+            const modal = document.getElementById('assetPickerModal');
+            modal.classList.add('active');
+            await loadAssetsForPicker();
+        }
+
+        // Close Asset Picker
+        function closeAssetPicker() {
+            const modal = document.getElementById('assetPickerModal');
+            modal.classList.remove('active');
+        }
+
+        // Load Assets for Picker
+        async function loadAssetsForPicker() {
+            try {
+                const response = await fetch(`${API_BASE}/assets?tenant_id=${TENANT_ID}&limit=500`);
+                pickerAssets = await response.json();
+                renderAssetPicker(pickerAssets);
+            } catch (error) {
+                console.error('Error loading assets:', error);
+                document.getElementById('assetPickerGrid').innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: #999;">Error loading assets</div>';
+            }
+        }
+
+        // Helper function to convert full URL to relative path
+        function getRelativeImagePath(fullUrl) {
+            if (!fullUrl) return '';
+            try {
+                const url = new URL(fullUrl);
+                return url.pathname;
+            } catch (e) {
+                return fullUrl;
+            }
+        }
+
+        // Render Asset Picker Grid
+        function renderAssetPicker(assets) {
+            const grid = document.getElementById('assetPickerGrid');
+
+            if (assets.length === 0) {
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📷</div>
+                        <div>No assets found</div>
+                        <div style="font-size: 12px; margin-top: 8px;">
+                            <a href="/ui/assets?tenant_id=${TENANT_ID}" target="_blank" style="color: #667eea;">Manage Assets</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = assets.map(asset => `
+                <div class="asset-picker-item ${selectedAssetId === asset.id ? 'selected' : ''}"
+                     onclick="selectAssetFromPicker('${asset.id}', '${getRelativeImagePath(asset.file_url)}')">
+                    <img class="asset-picker-thumbnail" src="${getRelativeImagePath(asset.file_url)}" alt="${asset.title || asset.filename}">
+                    <div class="asset-picker-info">
+                        ${(asset.title || asset.filename).substring(0, 20)}${(asset.title || asset.filename).length > 20 ? '...' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select Asset from Picker
+        function selectAssetFromPicker(assetId, assetUrl) {
+            selectedAssetId = assetId;
+            selectedAssetUrl = assetUrl;
+            renderAssetPicker(pickerAssets);
+        }
+
+        // Confirm Asset Selection
+        function confirmAssetSelection() {
+            if (selectedAssetId && selectedAssetUrl) {
+                const asset = pickerAssets.find(a => a.id === selectedAssetId);
+                showSelectedImage(selectedAssetUrl, asset);
+                closeAssetPicker();
+            }
+        }
+
+        // Handle Quick Upload
+        async function handleQuickUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('tenant_id', TENANT_ID);
+
+            try {
+                showError('');
+                const response = await fetch(`${API_BASE}/assets/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const asset = await response.json();
+                selectedAssetId = asset.id;
+                selectedAssetUrl = asset.file_url;
+                showSelectedImage(asset.file_url, asset);
+                showSuccess('Image uploaded successfully!');
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Failed to upload image. Please try again.');
+            }
+        }
+
+        // Show Selected Image
+        function showSelectedImage(url, asset) {
+            const preview = document.getElementById('selected-image-preview');
+            const thumbnail = document.getElementById('preview-thumbnail');
+            const info = document.getElementById('image-info');
+
+            thumbnail.src = url;
+            preview.style.display = 'block';
+
+            if (asset) {
+                const sizeInfo = asset.file_size ? ` • ${formatFileSize(asset.file_size)}` : '';
+                const dimInfo = asset.width && asset.height ? ` • ${asset.width}×${asset.height}` : '';
+                info.textContent = `${asset.title || asset.filename}${sizeInfo}${dimInfo}`;
+            }
+        }
+
+        // Clear Selected Image
+        function clearSelectedImage() {
+            selectedAssetId = null;
+            selectedAssetUrl = null;
+            document.getElementById('selected-image-preview').style.display = 'none';
+            document.getElementById('preview-thumbnail').src = '';
+            document.getElementById('image-info').textContent = '';
+        }
+
+        // Format File Size
+        function formatFileSize(bytes) {
+            if (!bytes) return 'Unknown';
+            const kb = bytes / 1024;
+            if (kb < 1024) return `${kb.toFixed(1)} KB`;
+            return `${(kb / 1024).toFixed(1)} MB`;
+        }
+    </script>
+
+    <!-- Asset Picker Modal -->
+    <div class="asset-picker-modal" id="assetPickerModal">
+        <div class="asset-picker-content">
+            <div class="asset-picker-header">
+                <h3>Select Image from Library</h3>
+                <button class="close-modal-btn" onclick="closeAssetPicker()">×</button>
+            </div>
+            <div class="asset-picker-body">
+                <div class="asset-picker-grid" id="assetPickerGrid">
+                    <div style="text-align: center; padding: 40px;">Loading...</div>
+                </div>
+            </div>
+            <div class="asset-picker-footer">
+                <button class="btn btn-secondary" onclick="closeAssetPicker()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmAssetSelection()">Use Selected Image</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

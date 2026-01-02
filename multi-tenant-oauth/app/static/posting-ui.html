@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Post Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .variation-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .variation-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .variation-card.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .variation-text {
+            white-space: pre-wrap;
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .similarity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .similarity-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .similarity-medium {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .similarity-high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .history-item {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 15px 0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-platform {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .history-caption {
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.5;
+            max-height: 60px;
+            overflow: hidden;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status-published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Asset Picker Modal */
+        .asset-picker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .asset-picker-modal.active {
+            display: flex;
+        }
+
+        .asset-picker-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asset-picker-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-picker-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .close-modal-btn:hover {
+            background: #f5f7fa;
+        }
+
+        .asset-picker-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .asset-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .asset-picker-item {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .asset-picker-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .asset-picker-item.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .asset-picker-thumbnail {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .asset-picker-info {
+            padding: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .asset-picker-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <h1 style="margin: 0;">Social Media Post Creator</h1>
+                    <p class="subtitle" id="restaurant-name" style="margin: 5px 0 0 0;">Loading...</p>
+                </div>
+                <a href="/ui/assets?tenant_id=1485f8b4-04e9-47b7-ad8a-27adbe78d20a" target="_blank"
+                   style="padding: 10px 20px; background: white; color: #667eea; border: 2px solid #667eea; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;"
+                   onmouseover="this.style.background='#667eea'; this.style.color='white';"
+                   onmouseout="this.style.background='white'; this.style.color='#667eea';">
+                    <span style="font-size: 18px;">📚</span> Manage Brand Assets
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-published">0</div>
+                    <div class="stat-label">Published</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-failed">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Column - Create Post -->
+            <div class="card">
+                <h2>Create New Post</h2>
+
+                <div class="error" id="error-message"></div>
+                <div class="success" id="success-message"></div>
+
+                <!-- Form -->
+                <form id="post-form">
+                    <div class="form-group">
+                        <label>Post Type</label>
+                        <select id="post-type">
+                            <option value="daily_special">Daily Special</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="event">Event</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="holiday">Holiday</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Name (Optional)</label>
+                        <input type="text" id="item-name" placeholder="e.g., Margherita Pizza">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description (Optional)</label>
+                        <textarea id="item-description" placeholder="Describe your special offer, item, or event..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image (Optional)</label>
+                        <div id="image-selection" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" onclick="openAssetPicker()" style="flex: 1;">
+                                    Browse Asset Library
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('quick-upload').click()" style="flex: 1;">
+                                    Quick Upload
+                                </button>
+                                <input type="file" id="quick-upload" accept="image/*" style="display: none;" onchange="handleQuickUpload(event)">
+                            </div>
+                            <div id="selected-image-preview" style="display: none; position: relative;">
+                                <img id="preview-thumbnail" src="" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
+                                <button type="button" onclick="clearSelectedImage()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 18px;">×</button>
+                                <div id="image-info" style="margin-top: 8px; font-size: 12px; color: #666;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tone</label>
+                        <select id="tone">
+                            <option value="friendly">Friendly</option>
+                            <option value="professional">Professional</option>
+                            <option value="casual">Casual</option>
+                            <option value="exciting">Exciting</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Platform</label>
+                        <select id="platform">
+                            <option value="facebook">Facebook</option>
+                            <option value="instagram">Instagram</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Generate Post Ideas
+                    </button>
+                </form>
+
+                <!-- Generated Variations -->
+                <div id="variations-container" style="margin-top: 30px; display: none;">
+                    <h3 style="margin-bottom: 15px; color: #333;">Select Your Favorite:</h3>
+                    <div id="variations-list"></div>
+
+                    <button id="publish-btn" class="btn btn-success btn-block" style="margin-top: 15px;">
+                        Publish Selected Post
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column - History -->
+            <div class="card">
+                <h2>Recent Posts</h2>
+                <div id="history-container">
+                    <div class="loading">Loading history...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:8000/api/v1';
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Krusty Pizza
+        const RESTAURANT_NAME = 'Krusty Pizza & Pasta';
+        const RESTAURANT_DESCRIPTION = 'Fresh authentic Italian pizza and pasta made with love';
+
+        let selectedVariation = null;
+        let variations = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadHistory();
+            document.getElementById('restaurant-name').textContent = RESTAURANT_NAME;
+        });
+
+        // Form submission
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await generateVariations();
+        });
+
+        // Publish button
+        document.getElementById('publish-btn').addEventListener('click', async () => {
+            if (selectedVariation !== null) {
+                await publishPost(variations[selectedVariation]);
+            }
+        });
+
+        // Generate content variations
+        async function generateVariations() {
+            try {
+                const postType = document.getElementById('post-type').value;
+                const itemName = document.getElementById('item-name').value;
+                const itemDescription = document.getElementById('item-description').value;
+                const tone = document.getElementById('tone').value;
+                const platform = document.getElementById('platform').value;
+
+                showError('');
+                showSuccess('');
+
+                const response = await fetch(`${API_BASE}/posts/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tenant_id: TENANT_ID,
+                        restaurant_name: RESTAURANT_NAME,
+                        restaurant_description: RESTAURANT_DESCRIPTION,
+                        post_type: postType,
+                        item_name: itemName || null,
+                        item_description: itemDescription || null,
+                        tone: tone,
+                        platform: platform,
+                        num_variations: 3
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate variations');
+                }
+
+                const data = await response.json();
+                variations = data.variations;
+                displayVariations(data.variations, data.similarity_scores);
+
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            }
+        }
+
+        // Display variations
+        function displayVariations(variations, scores) {
+            const container = document.getElementById('variations-list');
+            container.innerHTML = '';
+
+            variations.forEach((variation, index) => {
+                const card = document.createElement('div');
+                card.className = 'variation-card';
+                card.onclick = () => selectVariation(index);
+
+                const score = scores[index];
+                let badgeClass = 'similarity-low';
+                let badgeText = 'Original';
+
+                if (score > 0.5) {
+                    badgeClass = 'similarity-high';
+                    badgeText = 'Similar to recent';
+                } else if (score > 0.3) {
+                    badgeClass = 'similarity-medium';
+                    badgeText = 'Somewhat similar';
+                }
+
+                card.innerHTML = `
+                    <div class="variation-text">${variation}</div>
+                    <span class="similarity-badge ${badgeClass}">${badgeText} (${(score * 100).toFixed(0)}%)</span>
+                `;
+
+                container.appendChild(card);
+            });
+
+            document.getElementById('variations-container').style.display = 'block';
+            selectedVariation = 0;
+            selectVariation(0);
+        }
+
+        // Select variation
+        function selectVariation(index) {
+            selectedVariation = index;
+            const cards = document.querySelectorAll('.variation-card');
+            cards.forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+        }
+
+        // Publish post
+        async function publishPost(caption) {
+            try {
+                const platform = document.getElementById('platform').value;
+                const itemName = document.getElementById('item-name').value;
+
+                const requestBody = {
+                    tenant_id: TENANT_ID,
+                    platform: platform,
+                    caption: caption,
+                    item_name: itemName || null,
+                    publish_now: true
+                };
+
+                // Include asset_id if an image is selected
+                if (selectedAssetId) {
+                    requestBody.asset_id = selectedAssetId;
+                }
+
+                const response = await fetch(`${API_BASE}/posts/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to publish post');
+                }
+
+                const result = await response.json();
+                showSuccess(`Post published successfully! Post ID: ${result.platform_post_id}`);
+
+                // Reset form and reload
+                document.getElementById('post-form').reset();
+                document.getElementById('variations-container').style.display = 'none';
+                selectedVariation = null;
+                variations = [];
+
+                loadStats();
+                loadHistory();
+
+            } catch (error) {
+                showError(`Publishing error: ${error.message}`);
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/posts/stats?tenant_id=${TENANT_ID}&days=30`);
+                const stats = await response.json();
+
+                document.getElementById('stat-total').textContent = stats.total_posts;
+                document.getElementById('stat-published').textContent = stats.published;
+                document.getElementById('stat-failed').textContent = stats.failed;
+                document.getElementById('stat-pending').textContent = stats.pending;
+
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load history
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/posts/history?tenant_id=${TENANT_ID}&days=30&limit=10`);
+                const posts = await response.json();
+
+                const container = document.getElementById('history-container');
+                container.innerHTML = '';
+
+                if (posts.length === 0) {
+                    container.innerHTML = '<div class="loading">No posts yet</div>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+
+                    const date = new Date(post.posted_at || post.created_at);
+                    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+                    let statusClass = 'status-pending';
+                    if (post.status === 'published') statusClass = 'status-published';
+                    if (post.status === 'failed') statusClass = 'status-failed';
+
+                    item.innerHTML = `
+                        <div class="history-meta">
+                            <span class="history-platform">${post.platform}</span>
+                            <span class="history-date">${dateStr}</span>
+                        </div>
+                        <div class="history-caption">${post.caption}</div>
+                        <span class="status-badge ${statusClass}">${post.status}</span>
+                    `;
+
+                    container.appendChild(item);
+                });
+
+            } catch (error) {
+                document.getElementById('history-container').innerHTML =
+                    '<div class="loading">Failed to load history</div>';
+            }
+        }
+
+        // Helper functions
+        function showError(message) {
+            const el = document.getElementById('error-message');
+            el.textContent = message;
+            el.style.display = message ? 'block' : 'none';
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('success-message');
+            el.textContent = message;
+            el.style.display = message ? 'block' : 'none';
+
+            if (message) {
+                setTimeout(() => showSuccess(''), 5000);
+            }
+        }
+
+        // Asset Picker Variables
+        let selectedAssetId = null;
+        let selectedAssetUrl = null;
+        let pickerAssets = [];
+
+        // Open Asset Picker
+        async function openAssetPicker() {
+            const modal = document.getElementById('assetPickerModal');
+            modal.classList.add('active');
+            await loadAssetsForPicker();
+        }
+
+        // Close Asset Picker
+        function closeAssetPicker() {
+            const modal = document.getElementById('assetPickerModal');
+            modal.classList.remove('active');
+        }
+
+        // Load Assets for Picker
+        async function loadAssetsForPicker() {
+            try {
+                const response = await fetch(`${API_BASE}/assets?tenant_id=${TENANT_ID}&limit=500`);
+                pickerAssets = await response.json();
+                renderAssetPicker(pickerAssets);
+            } catch (error) {
+                console.error('Error loading assets:', error);
+                document.getElementById('assetPickerGrid').innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: #999;">Error loading assets</div>';
+            }
+        }
+
+        // Helper function to convert full URL to relative path
+        function getRelativeImagePath(fullUrl) {
+            if (!fullUrl) return '';
+            try {
+                const url = new URL(fullUrl);
+                return url.pathname;
+            } catch (e) {
+                return fullUrl;
+            }
+        }
+
+        // Render Asset Picker Grid
+        function renderAssetPicker(assets) {
+            const grid = document.getElementById('assetPickerGrid');
+
+            if (assets.length === 0) {
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📷</div>
+                        <div>No assets found</div>
+                        <div style="font-size: 12px; margin-top: 8px;">
+                            <a href="/ui/assets?tenant_id=${TENANT_ID}" target="_blank" style="color: #667eea;">Manage Assets</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = assets.map(asset => `
+                <div class="asset-picker-item ${selectedAssetId === asset.id ? 'selected' : ''}"
+                     onclick="selectAssetFromPicker('${asset.id}', '${getRelativeImagePath(asset.file_url)}')">
+                    <img class="asset-picker-thumbnail" src="${getRelativeImagePath(asset.file_url)}" alt="${asset.title || asset.filename}">
+                    <div class="asset-picker-info">
+                        ${(asset.title || asset.filename).substring(0, 20)}${(asset.title || asset.filename).length > 20 ? '...' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select Asset from Picker
+        function selectAssetFromPicker(assetId, assetUrl) {
+            selectedAssetId = assetId;
+            selectedAssetUrl = assetUrl;
+            renderAssetPicker(pickerAssets);
+        }
+
+        // Confirm Asset Selection
+        function confirmAssetSelection() {
+            if (selectedAssetId && selectedAssetUrl) {
+                const asset = pickerAssets.find(a => a.id === selectedAssetId);
+                showSelectedImage(selectedAssetUrl, asset);
+                closeAssetPicker();
+            }
+        }
+
+        // Handle Quick Upload
+        async function handleQuickUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('tenant_id', TENANT_ID);
+
+            try {
+                showError('');
+                const response = await fetch(`${API_BASE}/assets/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+
+                const asset = await response.json();
+                selectedAssetId = asset.id;
+                selectedAssetUrl = asset.file_url;
+                showSelectedImage(asset.file_url, asset);
+                showSuccess('Image uploaded successfully!');
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Failed to upload image. Please try again.');
+            }
+        }
+
+        // Show Selected Image
+        function showSelectedImage(url, asset) {
+            const preview = document.getElementById('selected-image-preview');
+            const thumbnail = document.getElementById('preview-thumbnail');
+            const info = document.getElementById('image-info');
+
+            thumbnail.src = url;
+            preview.style.display = 'block';
+
+            if (asset) {
+                const sizeInfo = asset.file_size ? ` • ${formatFileSize(asset.file_size)}` : '';
+                const dimInfo = asset.width && asset.height ? ` • ${asset.width}×${asset.height}` : '';
+                info.textContent = `${asset.title || asset.filename}${sizeInfo}${dimInfo}`;
+            }
+        }
+
+        // Clear Selected Image
+        function clearSelectedImage() {
+            selectedAssetId = null;
+            selectedAssetUrl = null;
+            document.getElementById('selected-image-preview').style.display = 'none';
+            document.getElementById('preview-thumbnail').src = '';
+            document.getElementById('image-info').textContent = '';
+        }
+
+        // Format File Size
+        function formatFileSize(bytes) {
+            if (!bytes) return 'Unknown';
+            const kb = bytes / 1024;
+            if (kb < 1024) return `${kb.toFixed(1)} KB`;
+            return `${(kb / 1024).toFixed(1)} MB`;
+        }
+    </script>
+
+    <!-- Asset Picker Modal -->
+    <div class="asset-picker-modal" id="assetPickerModal">
+        <div class="asset-picker-content">
+            <div class="asset-picker-header">
+                <h3>Select Image from Library</h3>
+                <button class="close-modal-btn" onclick="closeAssetPicker()">×</button>
+            </div>
+            <div class="asset-picker-body">
+                <div class="asset-picker-grid" id="assetPickerGrid">
+                    <div style="text-align: center; padding: 40px;">Loading...</div>
+                </div>
+            </div>
+            <div class="asset-picker-footer">
+                <button class="btn btn-secondary" onclick="closeAssetPicker()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmAssetSelection()">Use Selected Image</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

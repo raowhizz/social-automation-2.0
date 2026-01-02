@@ -1,0 +1,15 @@
+{
+  "posted_at": "20251117_012752",
+  "campaign": "Weekend Special",
+  "results": [
+    {
+      "item": "Carnivore Pizza",
+      "results": {
+        "facebook": {
+          "success": false,
+          "error": "403 Client Error: Forbidden for url: https://graph.facebook.com/v18.0/802786652928846/photos?access_token=EAAJ5haRCYbABP7YvlRrZBPg03HSpDYm3lt4Fku1jhWfHxE2gscvUiyRwmRAGW5dXpVZBCNAcvXnsKJFcqjAZBKmkC9g2DOeQz9VKSaPbMwop3xZCZCZCcFNOQF4FaoXwU9NLeQQZCGZB15QSoyd230YR73avQiUShmPoVSLnRzuoGESII3RIthP8QBma6FpwYuPr9PZAxtGrAZCj60b1r7knVVmZAinDRGX2VvD9WmmlZAMEiksZD&message=Weekend+mode%3A+ON+%F0%9F%8E%89%F0%9F%8D%95%21+Dive+into+relaxation+and+indulgence+with+our+Carnivore+Pizza+-+a+meat+lover%27s+paradise+on+a+crust%21+Imagine+a+bite+filled+with+beef+salami%2C+turkey+ham%2C+pepperoni%2C+and+so+much+more%2C+all+smothered+in+gooey+cheese+and+our+rich+red+sauce.+%F0%9F%A7%80%F0%9F%8D%96+It%27s+not+just+a+pizza%3B+it%27s+a+weekend+ritual%21+Perfect+for+your+cozy+night+in%2C+game+day+cheering%2C+or+that+family+movie+marathon.+Why+settle+for+ordinary+when+you+can+make+your+weekend+extraordinary+with+Krusty+Pizza+%26+Pasta%3F+%F0%9F%92%A5%E2%9C%A8+Order+now+and+let+the+feast+begin%21+%23MakeItADeliciousWeekend%0A%0A"
+        }
+      }
+    }
+  ]
+}

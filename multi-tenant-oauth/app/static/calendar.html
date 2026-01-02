@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Calendar - Restaurant Social Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header-content .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Calendar Controls */
+        .calendar-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .month-selector select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .month-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calendar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Calendar Stats */
+        .calendar-stats {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-item .label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-day-name {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-day {
+            min-height: 140px;
+            padding: 10px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .calendar-day.empty {
+            background: #f9fafb;
+            cursor: default;
+        }
+
+        .calendar-day.empty:hover {
+            border-color: #f0f0f0;
+            background: #f9fafb;
+        }
+
+        .day-number {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .calendar-day.today .day-number {
+            color: #667eea;
+            background: #e0e7ff;
+            padding: 4px 8px;
+            border-radius: 50%;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .post-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            color: white;
+            font-size: 12px;
+            line-height: 1.4;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-preview.draft {
+            background: #94a3b8;
+        }
+
+        .post-preview.approved {
+            background: #10b981;
+        }
+
+        .post-preview.published {
+            background: #3b82f6;
+        }
+
+        /* Post Type Color Coding */
+        .post-preview.type-promotional {
+            background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%);
+        }
+
+        .post-preview.type-product_showcase {
+            background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%);
+        }
+
+        .post-preview.type-weekend_traffic {
+            background: linear-gradient(135deg, #BA68C8 0%, #AB47BC 100%);
+        }
+
+        .post-preview.type-engagement {
+            background: linear-gradient(135deg, #FFF176 0%, #FFEE58 100%);
+            color: #333;
+        }
+
+        .post-preview.type-engagement .post-type-badge {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .post-preview.type-engagement .post-time {
+            color: #555;
+        }
+
+        .post-preview.type-customer_appreciation {
+            background: linear-gradient(135deg, #F48FB1 0%, #EC407A 100%);
+        }
+
+        .post-time {
+            font-size: 11px;
+            font-weight: 600;
+            opacity: 0.95;
+            margin-bottom: 4px;
+        }
+
+        .post-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.3;
+        }
+
+        .post-type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+            font-size: 10px;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+
+        .generation-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            padding: 3px 6px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .generation-badge.ai {
+            color: #7C3AED;
+        }
+
+        .generation-badge.template {
+            color: #059669;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge.approved {
+            color: #10b981;
+        }
+
+        .status-badge.draft {
+            color: #94a3b8;
+        }
+
+        .post-actions {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            display: none;
+            gap: 4px;
+        }
+
+        .post-preview:hover .post-actions {
+            display: flex;
+        }
+
+        .post-action-btn {
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #333;
+        }
+
+        .post-action-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        .post-action-btn.edit {
+            color: #3b82f6;
+        }
+
+        .post-action-btn.delete {
+            color: #ef4444;
+        }
+
+        .post-action-btn.approve {
+            color: #10b981;
+        }
+
+        .post-action-btn.draft {
+            color: #94a3b8;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        /* Loading & Messages */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">🍕 Restaurant Social Automation</div>
+        <div class="navbar-menu">
+            <a href="/ui" class="nav-link">Dashboard</a>
+            <a href="/ui/suggestions" class="nav-link">Post Ideas</a>
+            <a href="/ui/calendar" class="nav-link active">Calendar</a>
+            <a href="/ui/create" class="nav-link">Create Post</a>
+            <a href="/ui/config" class="nav-link">Config</a>
+            <a href="/ui/assets" class="nav-link">Assets</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <h1>📅 Monthly Content Calendar</h1>
+                <p class="subtitle">AI-generated posts strategically distributed across the month</p>
+            </div>
+        </div>
+
+        <!-- Message Area -->
+        <div id="messageArea"></div>
+
+        <!-- Calendar Controls -->
+        <div class="calendar-controls">
+            <div class="month-selector">
+                <select id="monthSelect">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="yearSelect">
+                    <!-- Generated by JavaScript -->
+                </select>
+                <button class="btn btn-primary" onclick="loadCalendar()">Load Calendar</button>
+            </div>
+            <div class="calendar-actions">
+                <button class="btn btn-primary" onclick="showGenerateModal()">Generate Calendar</button>
+                <button class="btn btn-danger" id="deleteCalendarBtn" onclick="deleteCurrentCalendar()" style="display:none;">Delete Calendar</button>
+                <button class="btn btn-success" id="approveBtn" onclick="approveCalendar()" style="display:none;">Approve All</button>
+            </div>
+        </div>
+
+        <!-- Calendar Stats -->
+        <div id="calendarStats" class="calendar-stats" style="display:none;">
+            <div class="stat-item">
+                <div class="value" id="totalPosts">0</div>
+                <div class="label">Total Posts</div>
+            </div>
+            <div class="stat-item">
+                <div class="value" id="approvedPosts">0</div>
+                <div class="label">Approved</div>
+            </div>
+            <div class="stat-item">
+                <div class="value" id="publishedPosts">0</div>
+                <div class="label">Published</div>
+            </div>
+            <div class="stat-item">
+                <div class="value" id="calendarStatus">-</div>
+                <div class="label">Status</div>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid">
+            <div id="calendarContent">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <h3>No Calendar Loaded</h3>
+                    <p>Select a month and click "Load Calendar" or generate a new one</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Post Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="editModalTitle">Edit Post</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editPostId">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Post Text</label>
+                    <textarea id="editPostText" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Scheduled Date</label>
+                        <input type="date" id="editDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Scheduled Time</label>
+                        <input type="time" id="editTime" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Platform</label>
+                    <select id="editPlatform">
+                        <option value="both">Both (Facebook & Instagram)</option>
+                        <option value="facebook">Facebook Only</option>
+                        <option value="instagram">Instagram Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Hashtags (comma-separated)</label>
+                    <input type="text" id="editHashtags" placeholder="#restaurant, #food, #delicious">
+                </div>
+
+                <div class="form-group">
+                    <label>Post Image</label>
+                    <div id="imagePreviewContainer" style="margin-top: 10px; display: none;">
+                        <img id="imagePreview" src="" alt="Post Image" style="max-width: 100%; max-height: 300px; border-radius: 8px; margin-bottom: 10px; display: block;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                            <span id="imageSource"></span>
+                        </div>
+                    </div>
+                    <div id="noImageMessage" style="padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center; color: #666;">
+                        No image attached to this post
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="deletePostBtn" class="btn btn-danger" onclick="deletePost()">Delete Post</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" id="savePostBtn" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Generate Calendar Modal -->
+    <div id="generateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Generate Monthly Calendar</h2>
+                <button class="close-btn" onclick="closeGenerateModal()">&times;</button>
+            </div>
+            <form id="generateForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Month</label>
+                        <select id="genMonth">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select id="genYear">
+                            <!-- Generated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Posts</label>
+                    <input type="number" id="genPostsCount" value="25" min="10" max="31" required>
+                    <small style="color: #666; font-size: 12px;">Recommended: 20-30 posts per month</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeGenerateModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Generate Calendar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
+        let currentCalendar = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSelectors();
+            setCurrentMonth();
+        });
+
+        function initializeSelectors() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('yearSelect');
+            const genYearSelect = document.getElementById('genYear');
+
+            // Populate year selectors
+            for (let year = currentYear - 1; year <= currentYear + 2; year++) {
+                const option1 = document.createElement('option');
+                option1.value = year;
+                option1.textContent = year;
+                yearSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = year;
+                option2.textContent = year;
+                genYearSelect.appendChild(option2);
+            }
+
+            yearSelect.value = currentYear;
+            genYearSelect.value = currentYear;
+        }
+
+        function setCurrentMonth() {
+            const currentMonth = new Date().getMonth() + 1;
+            document.getElementById('monthSelect').value = currentMonth;
+            document.getElementById('genMonth').value = currentMonth;
+        }
+
+        async function loadCalendar() {
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+
+            showMessage('Loading calendar...', 'info');
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/${year}/${month}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    currentCalendar = result.calendar;
+                    displayCalendar(result.calendar, result.posts, parseInt(year), parseInt(month));
+                    showMessage(`Calendar loaded successfully! ${result.posts.length} posts found.`, 'success');
+                } else {
+                    showEmptyCalendar();
+                    showMessage(result.error || 'Calendar not found. Generate one to get started!', 'info');
+                }
+            } catch (error) {
+                console.error('Error loading calendar:', error);
+                showMessage('Failed to load calendar. Please try again.', 'error');
+            }
+        }
+
+        function displayCalendar(calendar, posts, year, month) {
+            // Store posts globally for edit modal
+            window.calendarPosts = posts;
+
+            // Update stats
+            document.getElementById('calendarStats').style.display = 'grid';
+            document.getElementById('totalPosts').textContent = calendar.total_posts;
+            document.getElementById('approvedPosts').textContent = calendar.approved_posts;
+            document.getElementById('publishedPosts').textContent = calendar.published_posts;
+            document.getElementById('calendarStatus').textContent = calendar.status.charAt(0).toUpperCase() + calendar.status.slice(1);
+
+            // Show approve button if in draft status
+            document.getElementById('approveBtn').style.display = calendar.status === 'draft' ? 'block' : 'none';
+
+            // Show delete button when calendar is loaded
+            document.getElementById('deleteCalendarBtn').style.display = 'block';
+
+            // Create calendar grid
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month - 1;
+
+            let html = '<div class="calendar-header">';
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-name">${day}</div>`;
+            });
+            html += '</div><div class="calendar-days">';
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
+            }
+
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = isCurrentMonth && today.getDate() === day;
+                const dayPosts = posts.filter(p => {
+                    // Compare date strings directly to avoid timezone issues
+                    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    return p.scheduled_date === dateStr;
+                });
+
+                html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="selectDay(${year}, ${month}, ${day})">`;
+                html += `<div class="day-number">${day}</div>`;
+
+                dayPosts.forEach(post => {
+                    const generationBadge = post.generated_by === 'openai'
+                        ? '<div class="generation-badge ai">🤖 AI</div>'
+                        : '<div class="generation-badge template">📝 Template</div>';
+
+                    const statusBadge = post.status === 'approved'
+                        ? '<div class="status-badge approved">✓ Approved</div>'
+                        : '';
+
+                    const postTypeClass = post.post_type ? `type-${post.post_type}` : '';
+                    const statusClass = post.status;
+
+                    // Quick actions
+                    let quickActions = `
+                        <div class="post-actions">
+                            <button class="post-action-btn edit" onclick="event.stopPropagation(); editPost('${post.id}')" title="Edit">✏️</button>
+                    `;
+
+                    if (post.status === 'draft') {
+                        quickActions += `<button class="post-action-btn approve" onclick="event.stopPropagation(); approvePost('${post.id}')" title="Approve">✓</button>`;
+                    } else if (post.status === 'approved') {
+                        quickActions += `<button class="post-action-btn draft" onclick="event.stopPropagation(); revertToDraft('${post.id}')" title="Revert to Draft">↩️</button>`;
+                    }
+
+                    quickActions += `
+                            <button class="post-action-btn delete" onclick="event.stopPropagation(); confirmDeletePost('${post.id}')" title="Delete">🗑️</button>
+                        </div>
+                    `;
+
+                    html += `
+                        <div class="post-preview ${statusClass} ${postTypeClass}" onclick="event.stopPropagation(); editPost('${post.id}')">
+                            ${generationBadge}
+                            ${statusBadge}
+                            <div class="post-time">${formatTime(post.scheduled_time)}</div>
+                            <div class="post-title">${post.title}</div>
+                            <div class="post-type-badge">${formatPostType(post.post_type)}</div>
+                            ${quickActions}
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+            document.getElementById('calendarContent').innerHTML = html;
+        }
+
+        function showEmptyCalendar() {
+            document.getElementById('calendarStats').style.display = 'none';
+            document.getElementById('approveBtn').style.display = 'none';
+            document.getElementById('calendarContent').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <h3>No Calendar Found</h3>
+                    <p>Generate a new calendar to get started with AI-powered content suggestions</p>
+                    <button class="btn btn-primary" onclick="showGenerateModal()">Generate Calendar</button>
+                </div>
+            `;
+        }
+
+        async function generateCalendar(month, year, postsCount) {
+            showMessage('Generating calendar with AI... This may take a minute.', 'info');
+            closeGenerateModal();
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        year: parseInt(year),
+                        month: parseInt(month),
+                        posts_count: parseInt(postsCount)
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(`Calendar generated successfully! ${result.total_posts} posts created.`, 'success');
+
+                    // Load the newly generated calendar
+                    document.getElementById('monthSelect').value = month;
+                    document.getElementById('yearSelect').value = year;
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to generate calendar.', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating calendar:', error);
+                showMessage('Failed to generate calendar. Please try again.', 'error');
+            }
+        }
+
+        async function approveCalendar() {
+            if (!currentCalendar) return;
+
+            if (!confirm('Approve all posts in this calendar? They will be ready for publishing.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/${currentCalendar.id}/approve`, {
+                    method: 'PUT'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(`Calendar approved! ${result.approved_posts} posts are now approved.`, 'success');
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to approve calendar.', 'error');
+                }
+            } catch (error) {
+                console.error('Error approving calendar:', error);
+                showMessage('Failed to approve calendar. Please try again.', 'error');
+            }
+        }
+
+        async function deleteCurrentCalendar() {
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+
+            if (!confirm(`Delete the entire calendar for ${getMonthName(month)} ${year}? This will remove all posts and cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/${year}/${month}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage(result.message || 'Calendar deleted successfully!', 'success');
+
+                    // Hide the delete button
+                    document.getElementById('deleteCalendarBtn').style.display = 'none';
+                    document.getElementById('approveBtn').style.display = 'none';
+
+                    // Clear the calendar display
+                    showEmptyCalendar();
+                    currentCalendar = null;
+                } else {
+                    showMessage(result.error || 'Failed to delete calendar.', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting calendar:', error);
+                showMessage('Failed to delete calendar. Please try again.', 'error');
+            }
+        }
+
+        function editPost(postId) {
+            console.log('=== Edit Post Called ===');
+            console.log('Post ID:', postId);
+            console.log('Available posts in window:', window.calendarPosts);
+
+            // Find the post in current calendar
+            const posts = currentCalendar ? JSON.parse(JSON.stringify(currentCalendar.posts || [])) : [];
+            const post = posts.find(p => p.id === postId);
+
+            if (!post) {
+                // Fetch from current displayed data
+                showMessage('Loading post...', 'info');
+            }
+
+            // Set modal to edit mode
+            document.getElementById('editModalTitle').textContent = 'Edit Post';
+            document.getElementById('deletePostBtn').style.display = 'inline-block';
+            document.getElementById('savePostBtn').textContent = 'Save Changes';
+
+            // For now, we'll populate from the DOM
+            document.getElementById('editPostId').value = postId;
+
+            // We need to store posts globally when loading calendar
+            const storedPost = window.calendarPosts?.find(p => p.id === postId);
+            console.log('Found stored post:', storedPost);
+
+            if (storedPost) {
+                document.getElementById('editTitle').value = storedPost.title;
+                document.getElementById('editPostText').value = storedPost.post_text;
+                document.getElementById('editDate').value = storedPost.scheduled_date;
+                document.getElementById('editTime').value = storedPost.scheduled_time;
+                document.getElementById('editPlatform').value = storedPost.platform;
+                document.getElementById('editHashtags').value = (storedPost.hashtags || []).join(', ');
+
+                // Handle image display
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                const noImageMessage = document.getElementById('noImageMessage');
+                const imagePreview = document.getElementById('imagePreview');
+                const imageSource = document.getElementById('imageSource');
+
+                console.log('Image URL from post:', storedPost.image_url);
+                console.log('Image preview element:', imagePreview);
+                console.log('Image preview container:', imagePreviewContainer);
+
+                if (storedPost.image_url) {
+                    // Convert ngrok URL to local path for display
+                    let imageUrl = storedPost.image_url;
+                    if (imageUrl.includes('ngrok')) {
+                        // Extract the path part after the domain
+                        const urlParts = imageUrl.split('/uploads/');
+                        if (urlParts.length > 1) {
+                            imageUrl = '/uploads/' + urlParts[1];
+                        }
+                    }
+
+                    // Show image preview
+                    console.log('Original image URL:', storedPost.image_url);
+                    console.log('Converted image URL for display:', imageUrl);
+                    imagePreview.src = imageUrl;
+                    imageSource.textContent = storedPost.asset_id ?
+                        '📷 From brand assets' :
+                        '🤖 AI-generated image';
+                    imagePreviewContainer.style.display = 'block';
+                    noImageMessage.style.display = 'none';
+
+                    // Log after setting
+                    console.log('Image element src after setting:', imagePreview.src);
+                    console.log('Container display:', imagePreviewContainer.style.display);
+                } else {
+                    // No image
+                    console.log('No image URL found');
+                    imagePreviewContainer.style.display = 'none';
+                    noImageMessage.style.display = 'block';
+                }
+
+                document.getElementById('editModal').classList.add('active');
+            }
+        }
+
+        async function savePostEdits(event) {
+            event.preventDefault();
+            console.log('=== Save Post Edits Called ===');
+
+            const postId = document.getElementById('editPostId').value;
+            const postData = {
+                title: document.getElementById('editTitle').value,
+                post_text: document.getElementById('editPostText').value,
+                scheduled_date: document.getElementById('editDate').value,
+                scheduled_time: document.getElementById('editTime').value,
+                platform: document.getElementById('editPlatform').value,
+                hashtags: document.getElementById('editHashtags').value.split(',').map(h => h.trim()).filter(h => h)
+            };
+
+            console.log('Post ID:', postId);
+            console.log('Post Data:', postData);
+
+            try {
+                let response, result;
+
+                if (postId) {
+                    // Update existing post
+                    console.log('Updating existing post...');
+                    response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post/${postId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(postData)
+                    });
+                    result = await response.json();
+                    console.log('Update response:', result);
+
+                    if (result.success) {
+                        showMessage('Post updated successfully!', 'success');
+                    }
+                } else {
+                    // Create new post
+                    if (!currentCalendar) {
+                        showMessage('Please generate a calendar first.', 'error');
+                        return;
+                    }
+
+                    postData.calendar_id = currentCalendar.id;
+                    postData.post_type = 'general';  // Default type
+                    postData.status = 'draft';
+
+                    response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(postData)
+                    });
+                    result = await response.json();
+
+                    if (result.success) {
+                        showMessage('Post created successfully!', 'success');
+                    }
+                }
+
+                if (result.success) {
+                    closeEditModal();
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to save post.', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving post:', error);
+                showMessage('Failed to save post. Please try again.', 'error');
+            }
+        }
+
+        async function deletePost() {
+            const postId = document.getElementById('editPostId').value;
+
+            if (!confirm('Delete this post? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Post deleted successfully!', 'success');
+                    closeEditModal();
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to delete post.', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                showMessage('Failed to delete post. Please try again.', 'error');
+            }
+        }
+
+        async function confirmDeletePost(postId) {
+            if (!confirm('Delete this post? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Post deleted successfully!', 'success');
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to delete post.', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                showMessage('Failed to delete post. Please try again.', 'error');
+            }
+        }
+
+        async function approvePost(postId) {
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'approved' })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Post approved!', 'success');
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to approve post.', 'error');
+                }
+            } catch (error) {
+                console.error('Error approving post:', error);
+                showMessage('Failed to approve post. Please try again.', 'error');
+            }
+        }
+
+        async function revertToDraft(postId) {
+            try {
+                const response = await fetch(`/api/v1/restaurant/${TENANT_ID}/calendar/post/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'draft' })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('Post reverted to draft!', 'success');
+                    await loadCalendar();
+                } else {
+                    showMessage(result.error || 'Failed to revert post.', 'error');
+                }
+            } catch (error) {
+                console.error('Error reverting post:', error);
+                showMessage('Failed to revert post. Please try again.', 'error');
+            }
+        }
+
+        function selectDay(year, month, day) {
+            // Redirect to create page with pre-filled date
+            const selectedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            window.location.href = `/ui/create?date=${selectedDate}`;
+        }
+
+        // Modal functions
+        function showGenerateModal() {
+            document.getElementById('generateModal').classList.add('active');
+        }
+
+        function closeGenerateModal() {
+            document.getElementById('generateModal').classList.remove('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        // Form handlers
+        document.getElementById('generateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const month = document.getElementById('genMonth').value;
+            const year = document.getElementById('genYear').value;
+            const postsCount = document.getElementById('genPostsCount').value;
+            generateCalendar(month, year, postsCount);
+        });
+
+        document.getElementById('editForm').addEventListener('submit', savePostEdits);
+
+        // Helper functions
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${text}</div>`;
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+
+        function formatTime(timeStr) {
+            const time = new Date('2000-01-01T' + timeStr);
+            return time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        }
+
+        function formatPostType(type) {
+            return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function getMonthName(monthNumber) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[parseInt(monthNumber) - 1];
+        }
+
+        // Initialize posts array
+        window.calendarPosts = [];
+    </script>
+</body>
+</html>

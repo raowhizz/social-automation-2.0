@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Social Automation Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #10b981;
+        }
+
+        /* Navigation Cards */
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .nav-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .nav-card h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .nav-card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .nav-card.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-card.primary h3,
+        .nav-card.primary p {
+            color: white;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .chart-bar {
+            margin-bottom: 15px;
+        }
+
+        .chart-bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .chart-bar-fill {
+            height: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-bar-bg {
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-brand">🍕 Restaurant Social Automation</div>
+        <div class="navbar-menu">
+            <a href="/ui" class="nav-link active">Dashboard</a>
+            <a href="/ui/suggestions" class="nav-link">Post Ideas</a>
+            <a href="/ui/calendar" class="nav-link">Calendar</a>
+            <a href="/ui/create" class="nav-link">Create Post</a>
+            <a href="/ui/config" class="nav-link">Config</a>
+            <a href="/ui/assets" class="nav-link">Assets</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 id="restaurantName">Restaurant Dashboard</h1>
+            <p class="subtitle">Social media automation command center</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="menuItemsCount">-</div>
+                <div class="stat-label">Menu Items</div>
+                <div class="stat-change" id="menuChange"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="salesRecordsCount">-</div>
+                <div class="stat-label">Sales Records</div>
+                <div class="stat-change" id="salesChange"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value" id="topSeller">-</div>
+                <div class="stat-label">Top Seller</div>
+                <div class="stat-change" id="topSellerOrders"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📉</div>
+                <div class="stat-value" id="slowestDay">-</div>
+                <div class="stat-label">Slowest Day</div>
+                <div class="stat-change" id="slowestDayCount"></div>
+            </div>
+        </div>
+
+        <!-- Navigation Cards -->
+        <div class="nav-cards">
+            <a href="/ui/calendar" class="nav-card primary">
+                <div class="nav-card-icon">📅</div>
+                <h3>Monthly Content Calendar</h3>
+                <p>AI-generated monthly calendar with 20-30 strategically scheduled posts for Facebook & Instagram</p>
+            </a>
+
+            <a href="/ui/suggestions" class="nav-card">
+                <div class="nav-card-icon">💡</div>
+                <h3>AI Post Suggestions</h3>
+                <p>Get smart, context-aware post ideas based on your sales data and restaurant insights</p>
+            </a>
+
+            <a href="/ui/create" class="nav-card">
+                <div class="nav-card-icon">✍️</div>
+                <h3>Create Post</h3>
+                <p>Manually create and schedule social media posts for Facebook and Instagram</p>
+            </a>
+
+            <a href="/ui/config" class="nav-card">
+                <div class="nav-card-icon">⚙️</div>
+                <h3>Restaurant Config</h3>
+                <p>Upload menu data, sales reports, and configure your restaurant profile</p>
+            </a>
+
+            <a href="/ui/assets" class="nav-card">
+                <div class="nav-card-icon">🖼️</div>
+                <h3>Brand Assets</h3>
+                <p>Manage your restaurant's images, logos, and media library</p>
+            </a>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3>📅 Sales by Day of Week</h3>
+                <div id="dayChart"></div>
+            </div>
+
+            <div class="chart-card">
+                <h3>🏆 Top 5 Menu Items</h3>
+                <div id="topItemsChart"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8000';
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        // Load all dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load restaurant profile
+                const profileResponse = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/profile`);
+                if (profileResponse.ok) {
+                    const profile = await profileResponse.json();
+                    updateDashboard(profile);
+                }
+
+                // Load menu items for top sellers
+                const menuResponse = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/menu?sort_by=popularity_rank&limit=5`);
+                if (menuResponse.ok) {
+                    const menuItems = await menuResponse.json();
+                    updateTopItemsChart(menuItems);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Update dashboard with profile data
+        function updateDashboard(profile) {
+            // Update restaurant name
+            if (profile.name) {
+                document.getElementById('restaurantName').textContent = profile.name;
+            }
+
+            // Update stats
+            document.getElementById('menuItemsCount').textContent = profile.menu_items_count || 0;
+            document.getElementById('salesRecordsCount').textContent = profile.sales_records_count || 0;
+
+            // Update menu change indicator
+            if (profile.last_menu_import) {
+                const importDate = new Date(profile.last_menu_import);
+                document.getElementById('menuChange').textContent =
+                    `Last import: ${importDate.toLocaleDateString()}`;
+            }
+
+            // Update sales insights
+            if (profile.sales_insights) {
+                const insights = profile.sales_insights;
+
+                // Top seller
+                if (insights.item_performance && insights.item_performance.top_sellers) {
+                    const topSeller = insights.item_performance.top_sellers[0];
+                    if (topSeller) {
+                        document.getElementById('topSeller').textContent = topSeller.name;
+                        document.getElementById('topSellerOrders').textContent =
+                            `${topSeller.times_ordered} orders`;
+                    }
+                }
+
+                // Slowest day
+                if (insights.sales_patterns && insights.sales_patterns.slowest_days) {
+                    const slowestDay = insights.sales_patterns.slowest_days[0];
+                    document.getElementById('slowestDay').textContent = slowestDay || '-';
+
+                    if (insights.orders_by_day_of_week && insights.orders_by_day_of_week[slowestDay]) {
+                        const count = insights.orders_by_day_of_week[slowestDay].count;
+                        document.getElementById('slowestDayCount').textContent = `${count} orders`;
+                    }
+                }
+
+                // Day of week chart
+                if (insights.statistics && insights.statistics.orders_by_day_of_week) {
+                    updateDayChart(insights.statistics.orders_by_day_of_week);
+                }
+            }
+        }
+
+        // Update day of week chart
+        function updateDayChart(dayData) {
+            const chartContainer = document.getElementById('dayChart');
+            chartContainer.innerHTML = '';
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const maxCount = Math.max(...Object.values(dayData).map(d => d.count));
+
+            days.forEach(day => {
+                const data = dayData[day] || { count: 0, revenue: 0 };
+                const percentage = maxCount > 0 ? (data.count / maxCount) * 100 : 0;
+
+                const barHtml = `
+                    <div class="chart-bar">
+                        <div class="chart-bar-label">
+                            <span>${day}</span>
+                            <span>${data.count} orders ($${data.revenue.toFixed(0)})</span>
+                        </div>
+                        <div class="chart-bar-bg">
+                            <div class="chart-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                chartContainer.innerHTML += barHtml;
+            });
+        }
+
+        // Update top items chart
+        function updateTopItemsChart(items) {
+            const chartContainer = document.getElementById('topItemsChart');
+            chartContainer.innerHTML = '';
+
+            if (items.length === 0) {
+                chartContainer.innerHTML = '<p style="color: #999;">No data available</p>';
+                return;
+            }
+
+            const maxOrders = Math.max(...items.map(item => item.times_ordered || 0));
+
+            items.forEach((item, index) => {
+                const orders = item.times_ordered || 0;
+                const percentage = maxOrders > 0 ? (orders / maxOrders) * 100 : 0;
+
+                const barHtml = `
+                    <div class="chart-bar">
+                        <div class="chart-bar-label">
+                            <span>${index + 1}. ${item.name}</span>
+                            <span>${orders} orders</span>
+                        </div>
+                        <div class="chart-bar-bg">
+                            <div class="chart-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                chartContainer.innerHTML += barHtml;
+            });
+        }
+    </script>
+</body>
+</html>

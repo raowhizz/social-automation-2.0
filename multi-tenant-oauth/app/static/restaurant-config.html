@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Configuration - Social Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .insight-section {
+            margin-top: 30px;
+        }
+
+        .insight-card {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .insight-card h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .insight-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 3px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .file-preview {
+            background: #f3f4f6;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .file-preview.show {
+            display: block;
+        }
+
+        .recommendation {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .recommendation strong {
+            color: #92400e;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-brand">🍕 Restaurant Social Automation</div>
+        <div class="navbar-menu">
+            <a href="/ui" class="nav-link">Dashboard</a>
+            <a href="/ui/suggestions" class="nav-link">Post Ideas</a>
+            <a href="/ui/calendar" class="nav-link">Calendar</a>
+            <a href="/ui/create" class="nav-link">Create Post</a>
+            <a href="/ui/config" class="nav-link active">Config</a>
+            <a href="/ui/assets" class="nav-link">Assets</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🍕 Restaurant Configuration</h1>
+            <p class="subtitle">Upload your POS data and let AI understand your restaurant</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="menuItemsCount">-</div>
+                    <div class="stat-label">Menu Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="salesRecordsCount">-</div>
+                    <div class="stat-label">Sales Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="topSellerCount">-</div>
+                    <div class="stat-label">Top Sellers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="slowestDay">-</div>
+                    <div class="stat-label">Slowest Day</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restaurant Profile Section (Editable) -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2>🏪 Restaurant Profile</h2>
+            <p style="color: #666; margin-bottom: 20px;">Basic information about your restaurant (editable)</p>
+
+            <div id="profileAlerts"></div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="restaurantName">Restaurant Name *</label>
+                    <input type="text" id="restaurantName" class="form-input" placeholder="e.g., Krusty Pizza & Pasta" required>
+                </div>
+
+                <div class="grid-2" style="gap: 15px;">
+                    <div class="form-group">
+                        <label for="cuisineType">Cuisine Type *</label>
+                        <select id="cuisineType" class="form-input" required>
+                            <option value="">Select cuisine type...</option>
+                            <option value="Pizza">Pizza</option>
+                            <option value="Italian">Italian</option>
+                            <option value="American">American</option>
+                            <option value="Mexican">Mexican</option>
+                            <option value="Chinese">Chinese</option>
+                            <option value="Indian">Indian</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="Thai">Thai</option>
+                            <option value="Mediterranean">Mediterranean</option>
+                            <option value="Burgers">Burgers</option>
+                            <option value="Fast Food">Fast Food</option>
+                            <option value="Casual Dining">Casual Dining</option>
+                            <option value="Fine Dining">Fine Dining</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="(555) 123-4567">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input type="url" id="website" class="form-input" placeholder="https://yourrestaurant.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" class="form-input" placeholder="123 Main St">
+                </div>
+
+                <div class="grid-2" style="gap: 15px;">
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" class="form-input" placeholder="San Francisco">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" class="form-input" placeholder="CA">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Save Restaurant Profile</button>
+            </form>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid-2">
+            <!-- Menu Upload Section -->
+            <div class="card">
+                <h2>📋 Menu Data Import</h2>
+                <p style="color: #666; margin-bottom: 20px;">Upload your Innowi POS menu export file (.xlsx)</p>
+
+                <div id="menuAlerts"></div>
+
+                <div class="upload-area" id="menuDropzone" onclick="document.getElementById('menuFile').click()">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>Innowi POS menu Excel file (.xlsx)</small>
+                    </div>
+                </div>
+
+                <div class="file-preview" id="menuPreview">
+                    <strong>Selected:</strong> <span id="menuFileName"></span>
+                </div>
+
+                <input type="file" id="menuFile" class="file-input" accept=".xlsx,.xls">
+
+                <button class="btn" id="uploadMenuBtn" disabled>Upload Menu Data</button>
+
+                <div class="progress-bar" id="menuProgress" style="display: none;">
+                    <div class="progress-fill" id="menuProgressFill"></div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                        After uploading your menu, sync images to brand asset library
+                    </p>
+                    <button class="btn" id="syncMenuImagesBtn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                        🖼️ Sync Menu Images to Assets
+                    </button>
+                    <div id="syncProgress" style="margin-top: 10px; display: none;">
+                        <div style="color: #667eea; font-weight: 500;" id="syncStatus"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Upload Section -->
+            <div class="card">
+                <h2>📊 Sales Data Import</h2>
+                <p style="color: #666; margin-bottom: 20px;">Upload your Innowi POS order history file (.xlsx)</p>
+
+                <div id="salesAlerts"></div>
+
+                <div class="upload-area" id="salesDropzone" onclick="document.getElementById('salesFile').click()">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>Innowi POS sales/order history file (.xlsx)</small>
+                    </div>
+                </div>
+
+                <div class="file-preview" id="salesPreview">
+                    <strong>Selected:</strong> <span id="salesFileName"></span>
+                </div>
+
+                <input type="file" id="salesFile" class="file-input" accept=".xlsx,.xls">
+
+                <button class="btn" id="uploadSalesBtn" disabled>Upload Sales Data</button>
+
+                <div class="progress-bar" id="salesProgress" style="display: none;">
+                    <div class="progress-fill" id="salesProgressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Analysis Section -->
+        <div class="card">
+            <h2>🤖 AI Restaurant Intelligence</h2>
+            <p style="color: #666; margin-bottom: 20px;">Let AI analyze your menu and sales data to generate insights and recommendations</p>
+
+            <div id="analysisAlerts"></div>
+
+            <button class="btn" id="analyzeBtn" disabled>Run AI Analysis</button>
+
+            <div id="analysisLoading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your restaurant data...</p>
+            </div>
+        </div>
+
+        <!-- Insights Display -->
+        <div class="insight-section" id="insightsSection" style="display: none;">
+            <!-- Brand Personality -->
+            <div class="card">
+                <h2>🎨 Brand Personality <span style="font-size: 14px; color: #666; font-weight: normal;">(AI-Generated Insights)</span></h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    These insights are automatically generated from your menu and sales data. To update, modify your Restaurant Profile above and re-run the analysis.
+                </p>
+                <div id="brandInsights"></div>
+            </div>
+
+            <!-- Sales Insights -->
+            <div class="card" style="margin-top: 30px;">
+                <h2>📈 Sales Intelligence <span style="font-size: 14px; color: #666; font-weight: normal;">(AI-Generated Insights)</span></h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    Strategic recommendations based on your sales data and trends.
+                </p>
+                <div id="salesInsights"></div>
+            </div>
+
+            <!-- Content Strategy -->
+            <div class="card" style="margin-top: 30px;">
+                <h2>📱 Content Strategy <span style="font-size: 14px; color: #666; font-weight: normal;">(AI-Generated Recommendations)</span></h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    Personalized content strategy and posting recommendations for your restaurant.
+                </p>
+                <div id="contentStrategy"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8000';
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
+
+        let menuFile = null;
+        let salesFile = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfile();
+            setupFileHandlers();
+        });
+
+        // Load restaurant profile
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/profile`);
+                if (response.ok) {
+                    const profile = await response.json();
+                    updateStats(profile);
+
+                    // If analysis data exists, show insights
+                    if (profile.brand_analysis || profile.sales_insights || profile.content_strategy) {
+                        displayInsights(profile);
+                        document.getElementById('analyzeBtn').disabled = false;
+                    }
+
+                    // Enable analyze button if data is imported
+                    if (profile.menu_items_count > 0) {
+                        document.getElementById('analyzeBtn').disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Update stats
+        function updateStats(profile) {
+            document.getElementById('menuItemsCount').textContent = profile.menu_items_count || 0;
+            document.getElementById('salesRecordsCount').textContent = profile.sales_records_count || 0;
+
+            // Extract insights from analysis if available
+            if (profile.sales_insights && profile.sales_insights.sales_patterns) {
+                const patterns = profile.sales_insights.sales_patterns;
+                document.getElementById('slowestDay').textContent =
+                    patterns.slowest_days?.[0] || '-';
+            }
+
+            if (profile.sales_insights && profile.sales_insights.item_performance) {
+                const topSellers = profile.sales_insights.item_performance.top_sellers || [];
+                document.getElementById('topSellerCount').textContent = topSellers.length;
+            }
+
+            // Populate profile form
+            document.getElementById('restaurantName').value = profile.name || '';
+            document.getElementById('cuisineType').value = profile.cuisine_type || '';
+            document.getElementById('phone').value = profile.phone || '';
+            document.getElementById('website').value = profile.website || '';
+
+            if (profile.location) {
+                document.getElementById('address').value = profile.location.address || '';
+                document.getElementById('city').value = profile.location.city || '';
+                document.getElementById('state').value = profile.location.state || '';
+            }
+        }
+
+        // Setup file handlers
+        function setupFileHandlers() {
+            // Menu file input
+            document.getElementById('menuFile').addEventListener('change', function(e) {
+                menuFile = e.target.files[0];
+                if (menuFile) {
+                    document.getElementById('menuFileName').textContent = menuFile.name;
+                    document.getElementById('menuPreview').classList.add('show');
+                    document.getElementById('uploadMenuBtn').disabled = false;
+                }
+            });
+
+            // Sales file input
+            document.getElementById('salesFile').addEventListener('change', function(e) {
+                salesFile = e.target.files[0];
+                if (salesFile) {
+                    document.getElementById('salesFileName').textContent = salesFile.name;
+                    document.getElementById('salesPreview').classList.add('show');
+                    document.getElementById('uploadSalesBtn').disabled = false;
+                }
+            });
+
+            // Drag and drop for menu
+            setupDragDrop('menuDropzone', 'menuFile');
+            setupDragDrop('salesDropzone', 'salesFile');
+
+            // Upload buttons
+            document.getElementById('uploadMenuBtn').addEventListener('click', uploadMenu);
+            document.getElementById('uploadSalesBtn').addEventListener('click', uploadSales);
+            document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+            document.getElementById('syncMenuImagesBtn').addEventListener('click', syncMenuImages);
+
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', saveProfile);
+        }
+
+        // Setup drag and drop
+        function setupDragDrop(dropzoneId, fileInputId) {
+            const dropzone = document.getElementById(dropzoneId);
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    document.getElementById(fileInputId).files = files;
+                    document.getElementById(fileInputId).dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        // Upload menu
+        async function uploadMenu() {
+            if (!menuFile) return;
+
+            const formData = new FormData();
+            formData.append('file', menuFile);
+
+            showProgress('menu');
+            clearAlerts('menuAlerts');
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/import/menu`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('menuAlerts', 'success',
+                        `✅ Successfully imported ${result.items_imported} menu items!`);
+                    loadProfile();
+                    document.getElementById('analyzeBtn').disabled = false;
+                } else {
+                    showAlert('menuAlerts', 'error',
+                        `❌ Error: ${result.error || 'Upload failed'}`);
+                }
+            } catch (error) {
+                showAlert('menuAlerts', 'error', `❌ Error: ${error.message}`);
+            } finally {
+                hideProgress('menu');
+            }
+        }
+
+        // Upload sales
+        async function uploadSales() {
+            if (!salesFile) return;
+
+            const formData = new FormData();
+            formData.append('file', salesFile);
+
+            showProgress('sales');
+            clearAlerts('salesAlerts');
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/import/sales`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('salesAlerts', 'success',
+                        `✅ Successfully imported ${result.orders_imported} orders!`);
+                    loadProfile();
+                } else {
+                    showAlert('salesAlerts', 'error',
+                        `❌ Error: ${result.error || 'Upload failed'}`);
+                }
+            } catch (error) {
+                showAlert('salesAlerts', 'error', `❌ Error: ${error.message}`);
+            } finally {
+                hideProgress('sales');
+            }
+        }
+
+        // Sync menu images to assets
+        async function syncMenuImages() {
+            const btn = document.getElementById('syncMenuImagesBtn');
+            const progress = document.getElementById('syncProgress');
+            const status = document.getElementById('syncStatus');
+
+            btn.disabled = true;
+            progress.style.display = 'block';
+            status.textContent = 'Syncing images...';
+            clearAlerts('menuAlerts');
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/sync-menu-assets`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    status.textContent = `✅ Synced ${result.synced_count} of ${result.total_items} images (${result.skipped_count} skipped)`;
+                    showAlert('menuAlerts', 'success',
+                        `✅ Successfully synced ${result.synced_count} menu images to asset library!`);
+                } else {
+                    status.textContent = '';
+                    showAlert('menuAlerts', 'error',
+                        `❌ Error: ${result.error || 'Sync failed'}`);
+                }
+            } catch (error) {
+                status.textContent = '';
+                showAlert('menuAlerts', 'error', `❌ Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Run AI analysis
+        async function runAnalysis() {
+            document.getElementById('analysisLoading').style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = true;
+            clearAlerts('analysisAlerts');
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/analyze`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showAlert('analysisAlerts', 'success',
+                        '✅ AI analysis completed successfully!');
+
+                    // Reload profile to get updated insights
+                    await loadProfile();
+
+                    // Display insights
+                    displayInsights({
+                        brand_analysis: result.brand_analysis,
+                        sales_insights: result.sales_insights,
+                        content_strategy: result.content_strategy
+                    });
+                } else {
+                    showAlert('analysisAlerts', 'error',
+                        `❌ Error: ${result.error || 'Analysis failed'}`);
+                }
+            } catch (error) {
+                showAlert('analysisAlerts', 'error', `❌ Error: ${error.message}`);
+            } finally {
+                document.getElementById('analysisLoading').style.display = 'none';
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+
+        // Save restaurant profile
+        async function saveProfile(e) {
+            e.preventDefault();
+            clearAlerts('profileAlerts');
+
+            const profileData = {
+                name: document.getElementById('restaurantName').value,
+                cuisine_type: document.getElementById('cuisineType').value,
+                phone: document.getElementById('phone').value || null,
+                website: document.getElementById('website').value || null,
+                location: {
+                    address: document.getElementById('address').value || null,
+                    city: document.getElementById('city').value || null,
+                    state: document.getElementById('state').value || null
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert('profileAlerts', 'success',
+                        '✅ Restaurant profile saved successfully!');
+                    await loadProfile(); // Refresh profile data
+                } else {
+                    showAlert('profileAlerts', 'error',
+                        `❌ Error: ${result.detail || 'Failed to save profile'}`);
+                }
+            } catch (error) {
+                showAlert('profileAlerts', 'error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        // Display insights
+        function displayInsights(profile) {
+            const { brand_analysis, sales_insights, content_strategy } = profile;
+
+            // Brand Personality
+            if (brand_analysis && brand_analysis.brand_personality) {
+                const bp = brand_analysis.brand_personality;
+                const ca = brand_analysis.cuisine_analysis;
+                const ct = brand_analysis.content_themes;
+
+                document.getElementById('brandInsights').innerHTML = `
+                    <div class="insight-card">
+                        <h3>Voice & Personality</h3>
+                        <p><strong>Voice Tone:</strong> ${bp.voice_tone}</p>
+                        <p><strong>Target Audience:</strong> ${bp.target_audience}</p>
+                        <p style="margin-top: 10px;">
+                            ${bp.key_attributes?.map(attr => `<span class="tag">${attr}</span>`).join('') || ''}
+                        </p>
+                    </div>
+
+                    <div class="insight-card">
+                        <h3>Cuisine Identity</h3>
+                        <p><strong>Primary Cuisine:</strong> ${ca?.primary_cuisine || 'N/A'}</p>
+                        <p><strong>Style:</strong> ${ca?.cuisine_style || 'N/A'}</p>
+                        <p><strong>Price Point:</strong> ${ca?.price_positioning || 'N/A'}</p>
+                    </div>
+
+                    <div class="insight-card">
+                        <h3>Content Themes</h3>
+                        <p style="margin-top: 10px;">
+                            ${ct?.content_pillars?.map(pillar => `<span class="tag">${pillar}</span>`).join('') || ''}
+                        </p>
+                        <p style="margin-top: 10px;"><strong>Hashtags:</strong></p>
+                        <p>
+                            ${ct?.hashtag_suggestions?.map(tag => `<span class="tag">${tag}</span>`).join('') || ''}
+                        </p>
+                    </div>
+                `;
+            }
+
+            // Sales Insights
+            if (sales_insights) {
+                let salesHTML = '';
+
+                if (sales_insights.item_performance?.top_sellers) {
+                    const topSellers = sales_insights.item_performance.top_sellers.slice(0, 5);
+                    salesHTML += `
+                        <div class="insight-card">
+                            <h3>🏆 Top Sellers</h3>
+                            ${topSellers.map((item, i) => `
+                                <p><strong>${i + 1}. ${item.name}</strong> - ${item.times_ordered} orders</p>
+                                <p style="color: #666; margin-bottom: 10px;">${item.insight}</p>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                if (sales_insights.promotional_recommendations) {
+                    salesHTML += `
+                        <div class="insight-card">
+                            <h3>💰 Promotional Recommendations</h3>
+                            ${sales_insights.promotional_recommendations.map(promo => `
+                                <div class="recommendation">
+                                    <strong>${promo.strategy}</strong><br>
+                                    Target: ${promo.target_day}<br>
+                                    ${promo.reason}<br>
+                                    <strong style="color: #f59e0b;">Suggested: ${promo.suggested_discount}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                document.getElementById('salesInsights').innerHTML = salesHTML;
+            }
+
+            // Content Strategy
+            if (content_strategy) {
+                let strategyHTML = '';
+
+                if (content_strategy.posting_schedule) {
+                    const ps = content_strategy.posting_schedule;
+                    strategyHTML += `
+                        <div class="insight-card">
+                            <h3>📅 Posting Schedule</h3>
+                            <p><strong>Frequency:</strong> ${ps.frequency}</p>
+                            <p><strong>Best Days:</strong> ${ps.best_days_to_post?.join(', ')}</p>
+                            <p><strong>Best Times:</strong> ${ps.best_times?.join(', ')}</p>
+                            <p style="margin-top: 10px; color: #666;">${ps.rationale}</p>
+                        </div>
+                    `;
+                }
+
+                if (content_strategy.content_mix) {
+                    strategyHTML += `
+                        <div class="insight-card">
+                            <h3>🎯 Content Mix</h3>
+                            ${content_strategy.content_mix.map(mix => `
+                                <p><strong>${mix.content_type} (${mix.percentage}%)</strong></p>
+                                <p style="color: #666; margin-bottom: 10px;">${mix.description}</p>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                if (content_strategy.featured_items_rotation) {
+                    const fir = content_strategy.featured_items_rotation;
+                    strategyHTML += `
+                        <div class="insight-card">
+                            <h3>🔄 Featured Items Rotation</h3>
+                            <p style="margin-top: 10px;">
+                                ${fir.weekly_rotation?.map(item => `<span class="tag">${item}</span>`).join('') || ''}
+                            </p>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('contentStrategy').innerHTML = strategyHTML;
+            }
+
+            // Show insights section
+            document.getElementById('insightsSection').style.display = 'block';
+        }
+
+        // Helper functions
+        function showProgress(type) {
+            document.getElementById(`${type}Progress`).style.display = 'block';
+            animateProgress(type);
+        }
+
+        function hideProgress(type) {
+            document.getElementById(`${type}Progress`).style.display = 'none';
+            document.getElementById(`${type}ProgressFill`).style.width = '0%';
+        }
+
+        function animateProgress(type) {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById(`${type}ProgressFill`).style.width = progress + '%';
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+
+        function showAlert(containerId, type, message) {
+            const alertClass = type === 'success' ? 'alert-success' :
+                              type === 'error' ? 'alert-error' : 'alert-info';
+
+            const alertHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            document.getElementById(containerId).innerHTML = alertHTML;
+        }
+
+        function clearAlerts(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+    </script>
+</body>
+</html>

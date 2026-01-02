@@ -1,0 +1,34 @@
+{
+  "restaurant": "krusti_pizza_and_pasta",
+  "campaign": {
+    "name": "Weekend Special",
+    "description": "Weekend vibes call for delicious food! Check out our weekend favorites.",
+    "start_date": "2025-11-21T17:00:00.532764",
+    "end_date": "2025-11-23T23:59:59.532764",
+    "theme": "Relaxation, Indulgence, Weekend Vibes",
+    "keywords": [
+      "Weekend plans? We've got you covered",
+      "Perfect for a relaxing weekend",
+      "Treat yourself this weekend",
+      "Weekend favorites",
+      "Make it a delicious weekend"
+    ],
+    "target_items": []
+  },
+  "generated_at": "20251117_014218",
+  "items": [
+    {
+      "item_name": "Carnivore Pizza",
+      "original_image": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/data/restaurants/krusti_pizza_and_pasta/images/carnivore_pizza.jpg",
+      "image_analysis": "I'm unable to see the image of the Carnivore Pizza itself. To give a general analysis based on the description:\n\n1. **Visual Appeal Description**:\n   - **Colors**: Likely a rich combination of reds and browns from the meats, with a pleasant contrast from the cheese.\n   - **Presentation and Plating**: To enhance appeal, ensure the pizza is centered with slight toppings overlap to showcase abundance.\n\n2. **Key Ingredients Visible**:\n   - Beef salami, turkey ham, beef pepperoni, ground beef, beef Italian sausage, turkey bacon, and chicken are likely displayed prominently.\n\n3. **What Makes This Dish Look Appetizing**:\n   - The variety of meats suggests a hearty, indulgent experience. Glossy, melted cheese with a well-baked crust adds allure.\n\n4. **Suggested Emotional Appeal**:\n   - Indulgence and comfort, perfect for meat lovers seeking a hearty, satisfying meal.\n\n5. **Best Angle/Composition Notes**:\n   - A top-down view emphasizing the variety and abundance of toppings. Close-ups can highlight texture and quality.\n\nThese elements should make for a striking social media post that highlights the pizza's richness and diversity of flavors.",
+      "platforms": {
+        "facebook": {
+          "caption": "Weekend vibes? \ud83c\udf55\u2728 Krusty Pizza & Pasta has just what you need to dive into relaxation and indulgence! Our *Carnivore Pizza* is a feast for the senses \u2013 a bold, meaty adventure atop a golden, crispy crust, perfect for sharing or treating yourself. With beef salami, turkey ham, pepperoni, and so much more, it's the ultimate indulgence to make your weekend deliciously unforgettable. Why settle for ordinary when you can savor the extraordinary? Make your weekend plans with us and let every bite take you to a place of comfort and joy. Don't wait, make it a delicious weekend! \ud83c\udf89 Order now and let the good times roll. #KrustyPizzaAndPasta \ud83d\udcf2",
+          "hashtags": "",
+          "full_post": "Weekend vibes? \ud83c\udf55\u2728 Krusty Pizza & Pasta has just what you need to dive into relaxation and indulgence! Our *Carnivore Pizza* is a feast for the senses \u2013 a bold, meaty adventure atop a golden, crispy crust, perfect for sharing or treating yourself. With beef salami, turkey ham, pepperoni, and so much more, it's the ultimate indulgence to make your weekend deliciously unforgettable. Why settle for ordinary when you can savor the extraordinary? Make your weekend plans with us and let every bite take you to a place of comfort and joy. Don't wait, make it a delicious weekend! \ud83c\udf89 Order now and let the good times roll. #KrustyPizzaAndPasta \ud83d\udcf2\n\n",
+          "image_path": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/output/krusti_pizza_and_pasta/generated_content/carnivore_pizza_overlay_20251117_014218_facebook_20251117_014218.jpg"
+        }
+      }
+    }
+  ]
+}

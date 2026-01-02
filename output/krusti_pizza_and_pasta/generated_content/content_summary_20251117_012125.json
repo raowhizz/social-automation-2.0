@@ -1,0 +1,34 @@
+{
+  "restaurant": "krusti_pizza_and_pasta",
+  "campaign": {
+    "name": "Weekend Special",
+    "description": "Weekend vibes call for delicious food! Check out our weekend favorites.",
+    "start_date": "2025-11-21T17:00:00.532764",
+    "end_date": "2025-11-23T23:59:59.532764",
+    "theme": "Relaxation, Indulgence, Weekend Vibes",
+    "keywords": [
+      "Weekend plans? We've got you covered",
+      "Perfect for a relaxing weekend",
+      "Treat yourself this weekend",
+      "Weekend favorites",
+      "Make it a delicious weekend"
+    ],
+    "target_items": []
+  },
+  "generated_at": "20251117_012125",
+  "items": [
+    {
+      "item_name": "Carnivore Pizza",
+      "original_image": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/data/restaurants/krusti_pizza_and_pasta/images/carnivore_pizza.jpg",
+      "image_analysis": "I can't see the image of the pizza, but I can provide some general tips based on your description. \n\n1. **Visual Appeal Description**:\n   - **Colors**: Rich reds from the sauce and diverse brown tones from the meats create an inviting and hearty appearance.\n   - **Presentation**: A neatly arranged assortment of meats topping a golden-brown crust adds to the allure.\n   - **Plating**: Keep it simple to let the pizza's abundance speak for itself.\n\n2. **Key Ingredients Visible**:\n   - Beef Salami, Turkey Ham, Beef Pepperoni, Ground Beef, Beef Italian Sausage, Turkey Bacon, Chicken.\n   - A mix of these meats would present a meaty and substantial appeal on the pizza.\n\n3. **Appetizing Features**:\n   - The generous layers of meat create a mouthwatering and indulgent look.\n   - The combination of slightly crispy edges and juicy toppings entices the viewer.\n\n4. **Emotional Appeal**:\n   - **Indulgence**: The abundant assortment of meats promotes a luxury feel.\n   - **Comfort**: Perfect for meat lovers seeking a hearty, satisfying meal.\n\n5. **Best Angle/Composition**:\n   - A top-down view or a slightly angled side view showcasing the layers of toppings and hinting at the thickness of the crust.\n   - Bright lighting to highlight textures and colors, making it social media ready.",
+      "platforms": {
+        "facebook": {
+          "caption": "Wave goodbye to the week and hello to weekend indulgence with Krusty Pizza & Pasta! \ud83c\udf55\u2728 Dive into our weekend vibes with the ultimate comfort food: The Carnivore Pizza. Loaded with red sauce, beef salami, turkey ham, beef pepperoni, ground beef, beef Italian sausage, turkey bacon, and chicken, it's the perfect treat to pamper your taste buds and make your weekend special. Whether you're planning a cozy night in or looking for the perfect centerpiece for your party, our Carnivore Pizza promises bold flavors and big portions, making every bite an adventure. Don't let the weekend pass by without treating yourself to a slice (or two!) of mouthwatering perfection. Order now and make it a deliciously unforgettable weekend with Krusty Pizza & Pasta. Your neighborhood pizza destination awaits! \ud83c\udf89\ud83c\udf74 #MakeItDelicious #WeekendVibes",
+          "hashtags": "",
+          "full_post": "Wave goodbye to the week and hello to weekend indulgence with Krusty Pizza & Pasta! \ud83c\udf55\u2728 Dive into our weekend vibes with the ultimate comfort food: The Carnivore Pizza. Loaded with red sauce, beef salami, turkey ham, beef pepperoni, ground beef, beef Italian sausage, turkey bacon, and chicken, it's the perfect treat to pamper your taste buds and make your weekend special. Whether you're planning a cozy night in or looking for the perfect centerpiece for your party, our Carnivore Pizza promises bold flavors and big portions, making every bite an adventure. Don't let the weekend pass by without treating yourself to a slice (or two!) of mouthwatering perfection. Order now and make it a deliciously unforgettable weekend with Krusty Pizza & Pasta. Your neighborhood pizza destination awaits! \ud83c\udf89\ud83c\udf74 #MakeItDelicious #WeekendVibes\n\n",
+          "image_path": "/Users/asifrao/Library/CloudStorage/Dropbox/ABCD/Innowi/DataScience-AI-MIT/social-automation/output/krusti_pizza_and_pasta/generated_content/carnivore_pizza_overlay_20251117_012125_facebook_20251117_012125.jpg"
+        }
+      }
+    }
+  ]
+}

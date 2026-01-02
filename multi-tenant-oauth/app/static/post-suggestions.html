@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Post Suggestions - Restaurant Social Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Header */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Suggestions Grid */
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .suggestion-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .suggestion-icon {
+            font-size: 48px;
+            margin-right: 15px;
+        }
+
+        .suggestion-type {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #e0e7ff;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .suggestion-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .post-text-preview {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+            white-space: pre-wrap;
+        }
+
+        .suggestion-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .meta-item strong {
+            color: #333;
+        }
+
+        .featured-items {
+            margin-bottom: 15px;
+        }
+
+        .featured-items strong {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .item-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        .hashtags {
+            margin-bottom: 15px;
+        }
+
+        .hashtag {
+            display: inline-block;
+            color: #667eea;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+
+        .reason-box {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .reason-box strong {
+            color: #92400e;
+            font-size: 14px;
+        }
+
+        .reason-box p {
+            color: #78350f;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #059669;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-brand">🍕 Restaurant Social Automation</div>
+        <div class="navbar-menu">
+            <a href="/ui" class="nav-link">Dashboard</a>
+            <a href="/ui/suggestions" class="nav-link active">Post Ideas</a>
+            <a href="/ui/create" class="nav-link">Create Post</a>
+            <a href="/ui/config" class="nav-link">Config</a>
+            <a href="/ui/assets" class="nav-link">Assets</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1>💡 AI Post Suggestions</h1>
+                <p class="subtitle">Smart, context-aware post ideas based on your restaurant data</p>
+            </div>
+            <button id="generateBtn" class="generate-btn" onclick="generateSuggestions()">
+                Generate New Suggestions
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating intelligent post suggestions...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <!-- Suggestions Grid -->
+        <div id="suggestionsGrid" class="suggestions-grid"></div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📝</div>
+            <h3>No Suggestions Yet</h3>
+            <p>Click "Generate New Suggestions" to get AI-powered post ideas</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8000';
+        const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Replace with actual tenant ID
+
+        // Type to icon mapping
+        const TYPE_ICONS = {
+            'promotional': '🎉',
+            'product_showcase': '⭐',
+            'weekend_traffic': '🎊',
+            'engagement': '🤔',
+            'customer_appreciation': '💙'
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            generateSuggestions();
+        });
+
+        // Generate suggestions
+        async function generateSuggestions() {
+            const loadingState = document.getElementById('loadingState');
+            const errorMessage = document.getElementById('errorMessage');
+            const suggestionsGrid = document.getElementById('suggestionsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const generateBtn = document.getElementById('generateBtn');
+
+            // Show loading
+            loadingState.style.display = 'block';
+            errorMessage.style.display = 'none';
+            suggestionsGrid.innerHTML = '';
+            emptyState.style.display = 'none';
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/v1/restaurant/${TENANT_ID}/suggestions?count=5`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Hide loading
+                loadingState.style.display = 'none';
+                generateBtn.disabled = false;
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to generate suggestions');
+                }
+
+                const suggestions = result.suggestions || [];
+
+                if (suggestions.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    // Save suggestions to localStorage so they can be used in Create Post page
+                    localStorage.setItem('postSuggestions', JSON.stringify(suggestions));
+                    displaySuggestions(suggestions);
+                }
+
+            } catch (error) {
+                console.error('Error generating suggestions:', error);
+                loadingState.style.display = 'none';
+                generateBtn.disabled = false;
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Display suggestions
+        function displaySuggestions(suggestions) {
+            const suggestionsGrid = document.getElementById('suggestionsGrid');
+            suggestionsGrid.innerHTML = '';
+
+            suggestions.forEach((suggestion, index) => {
+                const card = createSuggestionCard(suggestion, index + 1);
+                suggestionsGrid.appendChild(card);
+            });
+        }
+
+        // Create suggestion card
+        function createSuggestionCard(suggestion, number) {
+            const card = document.createElement('div');
+            card.className = 'suggestion-card';
+
+            const icon = TYPE_ICONS[suggestion.type] || '📝';
+            const featuredItems = suggestion.featured_items || [];
+            const hashtags = suggestion.hashtags || [];
+
+            card.innerHTML = `
+                <div class="suggestion-header">
+                    <div class="suggestion-icon">${icon}</div>
+                    <span class="suggestion-type">${suggestion.type.replace('_', ' ')}</span>
+                </div>
+
+                <div class="suggestion-title">#${number}: ${suggestion.title}</div>
+
+                <div class="post-text-preview">${suggestion.post_text}</div>
+
+                <div class="suggestion-meta">
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span><strong>Target Day:</strong> ${suggestion.target_day}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>⏰</span>
+                        <span><strong>Best Time:</strong> ${suggestion.recommended_time}</span>
+                    </div>
+                </div>
+
+                ${featuredItems.length > 0 ? `
+                    <div class="featured-items">
+                        <strong>Featured Items:</strong><br>
+                        ${featuredItems.map(item => `<span class="item-tag">${item}</span>`).join('')}
+                    </div>
+                ` : ''}
+
+                ${hashtags.length > 0 ? `
+                    <div class="hashtags">
+                        ${hashtags.map(tag => `<span class="hashtag">${tag}</span>`).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="reason-box">
+                    <strong>💡 Why This Post?</strong>
+                    <p>${suggestion.reason}</p>
+                </div>
+
+                <a href="/ui/create?suggestion=${number}" class="cta-button">
+                    ${suggestion.call_to_action || 'Use This Suggestion'}
+                </a>
+            `;
+
+            return card;
+        }
+    </script>
+</body>
+</html>

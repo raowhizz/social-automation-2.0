@@ -1,0 +1,449 @@
+# Changelog
+
+All notable changes to the Social Automation Multi-Tenant OAuth Platform will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Planned Features
+- Restaurant description configuration per tenant (currently hardcoded)
+- AWS S3 integration for production image storage
+- Instagram posting implementation (API integration complete, needs testing)
+- Advanced analytics dashboard with engagement tracking
+- Multi-image carousel posts
+- Video posting support
+- Post templates library
+- Team collaboration features
+- Webhook integration for real-time updates
+- Automated publishing to approved calendar posts
+
+---
+
+## [1.0.4] - 2025-12-30
+
+### Fixed
+- **OpenAI API Compatibility**: Updated from deprecated `openai.ChatCompletion.create()` to new OpenAI client API
+  - Modified `RestaurantIntelligenceService` to use `OpenAI().chat.completions.create()`
+  - Changed import from `import openai` to `from openai import OpenAI`
+  - Updated initialization to create client instance
+  - Fixed all 3 API calls in `restaurant_intelligence_service.py`
+  - Ensures compatibility with openai>=1.0.0
+
+- **AI Content Generation Parameter Error**: Fixed missing `text_length` parameter
+  - Added `text_length: str = "extra_long"` parameter to `generate_post_caption()` method
+  - Fixed NameError that was preventing post generation
+  - Cleared Python bytecode cache to ensure proper code loading
+  - Post generation now works correctly with text length controls
+
+### Changed
+- **Server Startup**: Cleared Python cache files for clean deployments
+  - Removed all `__pycache__` directories
+  - Deleted `.pyc` bytecode files
+  - Ensures fresh code loading on server restart
+
+### Technical Details
+- Updated `app/services/restaurant_intelligence_service.py:83`
+- Updated `app/services/content_generator.py:48`
+- Compatible with OpenAI Python SDK v1.0.0+
+
+### Testing
+- Verified AI post generation works without errors
+- Confirmed text length parameter defaults to "extra_long"
+- Tested server restart with cache clearing
+- Validated OpenAI API integration
+
+---
+
+## [1.0.3] - 2025-12-29
+
+### Added
+- **Monthly Content Calendar System**:
+  - AI-generated monthly calendars with 20-30 strategically distributed posts
+  - Smart post scheduling based on sales patterns and day of week
+  - Visual calendar grid UI at `/ui/calendar`
+  - Post type-based optimal timing:
+    - Promotional posts: 10:00 AM (slow days)
+    - Product showcases: 6:00 PM (dinner time)
+    - Weekend drivers: 5:00 PM Friday
+    - Engagement posts: 12:00 PM (lunch)
+    - Customer appreciation: 3:00 PM
+  - Approval workflow: draft → approved → published
+  - Full CRUD operations for calendar posts
+  - Month/year navigation with calendar generation
+  - Post statistics: total, approved, published counts
+
+- **Database Schema**:
+  - `content_calendars` table for monthly calendar management
+  - `calendar_posts` table for scheduled posts
+  - Relationships with tenant isolation
+  - Alembic migration: `20251228_2357_ee873fe5c1e6_add_content_calendar_tables.py`
+
+- **API Endpoints**:
+  - `POST /api/v1/restaurant/{tenant_id}/calendar/generate` - Generate monthly calendar
+  - `GET /api/v1/restaurant/{tenant_id}/calendar/{year}/{month}` - Get calendar
+  - `PUT /api/v1/restaurant/{tenant_id}/calendar/{calendar_id}/approve` - Approve all posts
+  - `PUT /api/v1/restaurant/{tenant_id}/calendar/post/{post_id}` - Update post
+  - `DELETE /api/v1/restaurant/{tenant_id}/calendar/post/{post_id}` - Delete post
+
+- **Services**:
+  - `ContentCalendarService` - Calendar generation and management
+  - Strategic post distribution algorithm
+  - Integration with `PostSuggestionService` for content generation
+  - Smart scheduling based on restaurant sales data
+
+- **UI Components**:
+  - Calendar page with grid layout (`calendar.html`)
+  - Month/year selector with generate button
+  - Calendar stats dashboard
+  - Post preview cards with color-coded statuses
+  - Edit modal for post customization
+  - Generate modal with configurable post count
+  - Navigation integration across all pages
+  - Featured calendar card on main dashboard
+
+- **Restaurant Intelligence Enhancements**:
+  - Added `statistics.orders_by_day_of_week` to sales insights
+  - Day-by-day order counts and revenue tracking
+  - Powers dashboard "Sales by Day of Week" chart
+  - Enhanced `RestaurantIntelligenceService` template generation
+
+### Changed
+- **Dashboard UI**:
+  - Updated navigation menu to include Calendar link
+  - Added "Monthly Content Calendar" as primary featured card
+  - Moved previous features to secondary cards
+  - Fixed "Sales by Day of Week" chart (was empty)
+  - Chart now displays order counts and revenue per day
+
+- **Sales Insights Structure**:
+  - Modified `_template_sales_insights()` in `restaurant_intelligence_service.py`
+  - Added `statistics` field to sales insights JSON
+  - Includes detailed day-of-week breakdown for analytics
+
+- **Navigation**:
+  - Consistent calendar links across all UI pages
+  - Dashboard, Post Ideas, Calendar, Create Post, Config, Assets
+  - Calendar featured prominently on dashboard
+
+### Fixed
+- **Dashboard Chart**:
+  - "Sales by Day of Week" chart was displaying empty
+  - Missing `statistics.orders_by_day_of_week` field in profile data
+  - Chart now shows: Monday through Sunday with order counts and revenue
+  - Properly displays busiest day (Saturday: 26 orders, $1,767)
+  - Highlights slowest day (Thursday: 7 orders, $513)
+
+### Database Migrations
+- Migration `20251228_2357_ee873fe5c1e6` adds:
+  - `content_calendars` table with year/month indexing
+  - `calendar_posts` table with scheduling fields
+  - Status tracking and approval workflow
+  - Tenant isolation with CASCADE deletes
+
+### Testing
+- Generated test calendar for January 2025 with 6 posts
+- Verified strategic post distribution across month
+- Tested all CRUD operations (create, read, update, delete)
+- Confirmed approval workflow functionality
+- Validated chart data rendering on dashboard
+- Calendar accessible at http://localhost:8000/ui/calendar
+
+### Technical Details
+- **Post Distribution Algorithm**: Evenly distributes posts using `interval = month_days / posts_count`
+- **Strategic Timing**: Uses sales patterns (busiest_days, slowest_days) for optimal posting times
+- **Multi-Status Tracking**: draft, approved, published, rejected, failed
+- **Platform Support**: Facebook, Instagram, or both
+- **Content Types**: promotional, product_showcase, weekend_traffic, engagement, customer_appreciation
+
+### Known Improvements
+- Calendar posts can be edited before approval
+- Posts include: title, text, date, time, platform, hashtags, featured items
+- Strategic scheduling considers restaurant-specific sales patterns
+- Future: Auto-publish approved posts at scheduled time
+
+---
+
+## [1.0.2] - 2025-12-28
+
+### Fixed
+- **Image Posting to Facebook**: Images now appear correctly in Facebook posts
+  - Implemented direct file upload instead of URL-based posting
+  - Bypasses ngrok free tier interstitial page limitation
+  - Reads local image files and uploads as multipart/form-data
+  - Fixed bug in `app/api/posts.py` where `request.image_url` was used instead of `image_url` variable
+
+### Added
+- **ngrok Integration for Development**:
+  - Set up ngrok tunnel to expose localhost:8000 to the internet
+  - Configured public URL: `https://kristian-unrenewable-mercedez.ngrok-free.dev`
+  - Updated environment variables to use ngrok URL
+  - Created `NGROK_SETUP.md` documentation with setup instructions
+
+### Changed
+- **Image Posting Architecture**:
+  - Modified `_post_to_facebook()` function in `app/api/posts.py`
+  - Changed from URL-based image posting to direct file upload
+  - Extract file path from image_url and read file bytes
+  - Upload image data directly to Facebook Graph API
+  - Added comprehensive error handling for file operations
+
+### Infrastructure
+- **Database URL Migration**:
+  - Created `update_image_urls.py` utility script
+  - Migrated 3 brand_assets URLs from localhost to ngrok
+  - Migrated 6 post_history URLs from localhost to ngrok
+  - Ensures existing images remain accessible
+
+### Documentation
+- Added ngrok setup guide (`NGROK_SETUP.md`)
+- Documented image posting troubleshooting steps
+- Added production migration notes (ngrok → AWS S3)
+
+### Testing
+- Successfully posted to Facebook with images
+- Verified Facebook post ID: 122112052983135398
+- Confirmed image appears in live Facebook post
+
+---
+
+## [1.0.1] - 2025-12-27 to 2025-12-28
+
+### Added
+- **Brand Asset Management System**:
+  - Hierarchical folder structure for organizing restaurant images
+  - Folders: Food (Pizza, Pasta, Appetizers, Desserts), Drinks, Restaurant, Seasonal
+  - Asset upload with metadata and tagging support
+  - Visual asset browser with grid layout in posting UI
+  - Quick upload functionality for on-the-fly image uploads
+  - Sidebar navigation for easy folder access
+  - Support for JPEG, PNG, GIF, WebP formats
+
+- **AI-Powered Content Generation**:
+  - Integrated OpenAI GPT-4 for social media caption generation
+  - Context-aware prompts using restaurant description and item details
+  - Smart anti-repetition system that analyzes recent posts
+  - Platform-specific optimization (Facebook vs Instagram)
+  - Customizable tone (casual, professional, humorous, promotional, educational)
+  - Maximum character length constraints
+  - Automatic emoji and hashtag inclusion
+  - Call-to-action generation
+
+- **Database Models**:
+  - `BrandAsset` model with metadata and tagging
+  - `BrandFolder` model with hierarchical parent-child relationships
+  - Asset-folder relationship tracking
+  - Created and updated timestamps
+
+- **API Endpoints**:
+  - `POST /api/v1/tenants/{tenant_id}/init-folders` - Initialize folder structure
+  - `GET /api/v1/tenants/{tenant_id}/folders` - List folders
+  - `POST /api/v1/folders` - Create folder
+  - `GET /api/v1/folders/{folder_id}/assets` - List assets
+  - `POST /api/v1/folders/{folder_id}/assets` - Upload asset
+  - `DELETE /api/v1/assets/{asset_id}` - Delete asset
+  - `POST /api/v1/posts/generate` - Generate AI caption
+  - `PUT /api/v1/assets/{asset_id}` - Update asset metadata
+
+- **Services**:
+  - `AssetService` for brand asset management
+  - `ContentGeneratorService` for AI-powered caption generation
+  - Integration with OpenAI API
+
+- **UI Components**:
+  - Asset picker modal in posting interface
+  - "Browse Asset Library" button
+  - "Quick Upload" button for direct uploads
+  - Folder tree navigation in sidebar
+  - Asset detail view with metadata editing
+
+### Changed
+- **Posting UI Enhanced**:
+  - Added image selection from brand asset library
+  - Integrated AI caption generation with custom parameters
+  - Restaurant description and item details form fields
+  - Tone selector for content generation
+  - Platform selector (Facebook/Instagram)
+
+- **OpenAI Configuration**:
+  - Added `GPT_TEXT_MODEL` environment variable
+  - Configurable model selection via .env
+  - Fallback to template-based generation if API fails
+
+- **Content Generation Logic**:
+  - System message defines AI as creative social media manager
+  - User prompt includes restaurant context
+  - Recent post history for anti-repetition
+  - Platform-specific optimization instructions
+
+### Fixed
+- Template-based vs AI-generated post differentiation
+- OpenAI API key environment loading after .env updates
+- Server restart required after environment changes
+
+### Testing
+- Uploaded 3 test images (pizza, pasta, chicken wings)
+- Verified folder structure initialization
+- Tested AI caption generation with OpenAI GPT-4
+- Confirmed unique, contextual captions generated
+- Validated asset picker UI functionality
+
+### Known Issues
+- Restaurant description currently hardcoded in `posting-ui.html:563`
+- Should be moved to tenant configuration for multi-tenant support
+
+---
+
+## [1.0.0] - 2025-12-26
+
+### Added - Initial Release
+- **Multi-Tenant Architecture**:
+  - Complete tenant isolation with dedicated data per restaurant
+  - Support for 1,000+ concurrent tenants
+  - Tiered plans: Basic, Pro, Enterprise
+  - Per-tenant rate limiting and posting quotas
+
+- **OAuth2 Authentication**:
+  - Facebook OAuth 2.0 flow implementation
+  - Instagram Business account connection
+  - CSRF protection with state tokens
+  - OAuth state management with 10-minute expiration
+  - Secure redirect URI validation
+
+- **Token Management**:
+  - AES-256-GCM encryption for all OAuth tokens
+  - Automatic token refresh before expiration
+  - Token health monitoring and status tracking
+  - Background jobs for proactive token refresh
+  - Token expiration alerts
+  - Refresh token rotation
+
+- **Database Schema**:
+  - `tenants` - Restaurant accounts
+  - `tenant_users` - Admin users per tenant
+  - `social_accounts` - Connected Facebook/Instagram accounts
+  - `oauth_tokens` - Encrypted access and refresh tokens
+  - `token_refresh_history` - Audit log of token operations
+  - `post_history` - Complete posting history
+  - `webhook_events` - Platform webhook events
+  - `oauth_state` - CSRF protection tokens
+
+- **Core Services**:
+  - `OAuthService` - OAuth flow handling
+  - `TokenService` - Token lifecycle management
+  - `EncryptionService` - AES-256-GCM encryption
+  - `PostingService` - Multi-tenant posting (placeholder)
+
+- **API Endpoints**:
+  - `POST /api/v1/tenants` - Register new tenant
+  - `GET /api/v1/oauth/facebook/authorize` - Start OAuth
+  - `GET /api/v1/oauth/facebook/callback` - OAuth callback
+  - `GET /api/v1/tenants/{tenant_id}/accounts` - List accounts
+  - `DELETE /api/v1/accounts/{account_id}` - Disconnect account
+  - `GET /api/v1/accounts/{account_id}/token-health` - Token status
+  - `POST /api/v1/tokens/refresh` - Manual token refresh
+
+- **Background Jobs (Celery)**:
+  - Automatic token refresh (runs every 24 hours)
+  - OAuth state cleanup (runs every hour)
+  - Token expiration monitoring
+  - Failed refresh retry logic
+
+- **Infrastructure**:
+  - FastAPI application with CORS support
+  - PostgreSQL database with SQLAlchemy 2.0 ORM
+  - Redis for caching and Celery task queue
+  - Celery Beat scheduler for periodic tasks
+  - Structured logging system
+
+- **Security Features**:
+  - Token encryption at rest
+  - CSRF protection for OAuth flow
+  - Secure token storage
+  - Per-tenant data isolation
+  - Rate limiting per plan tier
+
+- **Health Checks**:
+  - `GET /health` - API health status
+  - `GET /health/db` - Database connectivity
+  - `GET /health/redis` - Redis connectivity
+
+- **Documentation**:
+  - `SESSION_LOG.md` - Development session tracking
+  - `CONVERSATION_LOG.md` - Complete conversation history
+  - `QUICKSTART.md` - 30-minute setup guide
+  - `FACEBOOK_APP_SETUP.md` - Facebook app configuration
+  - `DATABASE_SETUP.md` - Database setup instructions
+  - `ENVIRONMENT_SETUP.md` - Environment configuration
+  - Interactive API docs (Swagger UI, ReDoc)
+
+### Technical Stack
+- **Backend**: FastAPI 0.104+, Python 3.11+
+- **Database**: PostgreSQL 14+ with SQLAlchemy 2.0
+- **Cache/Queue**: Redis 7+
+- **Task Queue**: Celery 5+ with Beat
+- **Encryption**: cryptography library (AES-256-GCM)
+- **OAuth**: Facebook Graph API v18.0
+- **Logging**: Python logging module
+
+### Testing
+- Successfully registered first tenant (Krusty Pizza)
+- Completed OAuth flow with Facebook
+- Connected Facebook Pages
+- Verified token encryption and storage
+- Tested automatic token refresh
+- Confirmed health check endpoints
+- Validated CSRF protection
+
+---
+
+## Release Notes
+
+### Version Naming Convention
+- **Major.Minor.Patch** (Semantic Versioning)
+- **Major**: Breaking changes or major feature releases
+- **Minor**: New features, backward compatible
+- **Patch**: Bug fixes and minor improvements
+
+### Support Policy
+- **Latest version**: Full support with bug fixes and features
+- **Previous version**: Security fixes only
+- **Older versions**: Community support via GitHub issues
+
+---
+
+## Migration Guides
+
+### Migrating from v1.0.0 to v1.0.1
+1. Pull latest code from git
+2. No database schema changes required
+3. Add `OPENAI_API_KEY` to .env (optional)
+4. Add `GPT_TEXT_MODEL=gpt-4` to .env
+5. Restart FastAPI server
+6. Initialize folder structure for existing tenants:
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/tenants/{tenant_id}/init-folders
+   ```
+
+### Migrating from v1.0.1 to v1.0.2
+1. Pull latest code from git
+2. No database schema changes required
+3. Set up ngrok (development) or S3 (production) for image hosting
+4. Update .env with new `API_URL` and `PUBLIC_URL`
+5. Run `update_image_urls.py` to migrate existing image URLs
+6. Restart FastAPI server
+7. Test image posting to verify fix
+
+---
+
+## Contributors
+
+- Claude (AI Assistant) - Implementation, documentation, architecture
+- Asif Rao - Product owner, requirements, testing, feedback
+
+---
+
+## License
+
+Copyright 2025. All rights reserved.
