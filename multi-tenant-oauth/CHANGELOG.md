@@ -9,8 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned Features
 - Restaurant description configuration per tenant (currently hardcoded)
-- AWS S3 integration for production image storage
-- Instagram posting implementation (API integration complete, needs testing)
+- Multi-account posting (post to multiple Facebook/Instagram accounts simultaneously)
 - Advanced analytics dashboard with engagement tracking
 - Multi-image carousel posts
 - Video posting support
@@ -18,6 +17,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Team collaboration features
 - Webhook integration for real-time updates
 - Automated publishing to approved calendar posts
+
+---
+
+## [2.4.0] - 2026-01-06
+
+### 🎉 Major Achievement: Instagram Posting Fully Working!
+
+### Added
+- **Instagram Posting with S3 URLs**
+  - Full Instagram posting support using menu item images from S3
+  - Business Manager API integration for fetching Instagram Business accounts
+  - Automatic detection and connection of Instagram accounts linked to Facebook Pages
+  - Two-step Instagram publishing: container creation → publish
+  - Complete error handling with detailed logging
+  - Support for captions, hashtags, and image posts
+
+- **S3 URL Priority System**
+  - Updated `post_suggestion_service.py` to prioritize direct S3 URLs over asset_id lookups
+  - Modified `posts.py` API to only use asset_id when no direct URL is provided
+  - Added defensive URL resolution in `content_calendar_service.py`
+  - Smart image selection that prevents ngrok URL usage
+
+- **Database Migration for S3 URLs**
+  - Migrated 49 brand assets from ngrok URLs to S3 URLs
+  - Synchronized brand_assets.file_url with menu_items.image_url for all menu items
+  - Maintained data integrity between menu items and brand assets
+
+- **Frontend S3 URL Support**
+  - Fixed `getRelativeImagePath()` to preserve full S3 URLs
+  - Asset library now displays images from both S3 and local storage
+  - Proper handling of external URLs (S3) vs internal paths (ngrok)
+  - Image preview and selection working with S3 URLs
+
+### Fixed
+- **Instagram Image Download Error (Error 9004, subcode 2207052)**
+  - Root cause: System was using ngrok URLs that Instagram couldn't access
+  - Solution: Prioritize S3 URLs from menu items over brand_assets references
+  - Result: Instagram can now successfully download images from public S3 URLs
+
+- **Asset Library Image Loading**
+  - Fixed 404 errors when displaying S3-hosted images
+  - Corrected URL construction in frontend JavaScript
+  - Browser now loads images directly from S3 instead of proxying through ngrok
+
+- **Token Permissions Error**
+  - Fixed permissions error by passing platform_account_id to token retrieval
+  - Ensures correct page-specific token is used for each social account
+
+### Technical Details
+- Business Manager API queries both `/me/accounts` and `/me/businesses` endpoints
+- Handles pages in personal profiles and business portfolios
+- Deduplication logic prevents duplicate page entries
+- OAuth scopes: `business_management`, `instagram_basic`, `instagram_content_publish`, `instagram_manage_insights`
+
+### Documentation
+- Updated INSTAGRAM_SETUP.md with complete working status
+- Documented S3 URL solution and migration process
+- Added troubleshooting guide for image hosting
 
 ---
 

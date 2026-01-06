@@ -712,7 +712,7 @@
 
     <script>
         // Configuration
-        const API_BASE = 'http://localhost:8000/api/v1';
+        const API_BASE = window.location.origin + '/api/v1';
         const TENANT_ID = '1485f8b4-04e9-47b7-ad8a-27adbe78d20a'; // Krusty Pizza
         const RESTAURANT_NAME = 'Krusty Pizza & Pasta';
         const RESTAURANT_DESCRIPTION = 'Fresh authentic Italian pizza and pasta made with love';
@@ -1338,10 +1338,16 @@
         }
 
         // Helper function to convert full URL to relative path
+        // For S3 URLs, return the full URL. For local URLs, return pathname.
         function getRelativeImagePath(fullUrl) {
             if (!fullUrl) return '';
             try {
                 const url = new URL(fullUrl);
+                // If it's an S3 URL, return the full URL
+                if (url.hostname.includes('s3') || url.hostname.includes('amazonaws')) {
+                    return fullUrl;
+                }
+                // Otherwise return pathname (for local/ngrok URLs)
                 return url.pathname;
             } catch (e) {
                 return fullUrl;

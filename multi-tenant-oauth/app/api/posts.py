@@ -10,8 +10,10 @@ import requests
 from app.models.base import get_db
 from app.services import PostService, ContentGenerator, TokenService, ImageService, SchedulerService
 from app.models import PostHistory, SocialAccount
+from app.utils.logger import get_logger
 
 router = APIRouter(prefix="/api/v1/posts", tags=["posts"])
+logger = get_logger(__name__)
 
 
 # Pydantic models for request/response
@@ -167,8 +169,10 @@ async def create_post(
         )
 
     # Resolve asset_id to image_url if provided
+    # Prioritize direct image_url (S3 URLs) over asset_id (may have ngrok URLs)
     image_url = request.image_url
-    if request.asset_id:
+    if request.asset_id and not image_url:
+        # Only fetch from asset if no direct URL was provided
         from app.services import AssetService
         asset_service = AssetService()
         asset = asset_service.get_asset(db, request.asset_id)
@@ -201,11 +205,12 @@ async def create_post(
     # Publish immediately if requested
     if request.publish_now and not request.scheduled_for:
         try:
-            # Get OAuth token
+            # Get OAuth token for specific account
             access_token = token_service.get_active_token(
                 db=db,
                 tenant_id=request.tenant_id,
                 platform=request.platform,
+                platform_account_id=social_account.platform_account_id,
             )
 
             if not access_token:
@@ -434,6 +439,10 @@ def _post_to_instagram(
     if not image_url:
         raise Exception("Instagram posts require an image")
 
+    logger.info(f"Instagram posting - Account ID: {instagram_account_id}")
+    logger.info(f"Instagram posting - Image URL: {image_url}")
+    logger.info(f"Instagram posting - Caption length: {len(caption)} chars")
+
     # Step 1: Create container
     container_url = f"https://graph.facebook.com/v18.0/{instagram_account_id}/media"
     container_data = {
@@ -442,11 +451,14 @@ def _post_to_instagram(
         "access_token": access_token,
     }
 
+    logger.info(f"Instagram API - Creating container at: {container_url}")
     response = requests.post(container_url, data=container_data)
     result = response.json()
+    logger.info(f"Instagram API - Container response: {result}")
 
     if "id" not in result:
         error = result.get("error", {})
+        logger.error(f"Instagram API - Container creation failed: {result}")
         raise Exception(error.get("message", "Failed to create Instagram container"))
 
     container_id = result["id"]

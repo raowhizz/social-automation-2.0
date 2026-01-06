@@ -13,6 +13,9 @@ from sqlalchemy.orm import Session
 
 from app.models import Tenant, SocialAccount, OAuthToken, OAuthState
 from app.utils.encryption import get_encryption_service
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class OAuthService:
@@ -162,8 +165,16 @@ class OAuthService:
         if not user_access_token:
             raise ValueError("No access token received from Facebook")
 
-        # Get user's Facebook Pages
-        pages = self._get_user_pages(user_access_token)
+        # Get user's Facebook Pages from both personal profile and business portfolios
+        logger.info("Fetching pages from /me/accounts (personal profile)")
+        personal_pages = self._get_user_pages(user_access_token)
+
+        logger.info("Fetching pages from /me/businesses (business portfolios)")
+        business_pages = self._get_business_pages(user_access_token)
+
+        # Merge and deduplicate pages from both sources
+        pages = self._merge_pages(personal_pages, business_pages)
+        logger.info(f"Total pages to process: {len(pages)}")
 
         # Store tokens for each page
         social_accounts = []
@@ -205,7 +216,118 @@ class OAuthService:
             raise ValueError(f"Failed to fetch pages: {response.text}")
 
         data = response.json()
-        return data.get("data", [])
+        logger.info(f"Facebook Pages API response: {data}")
+
+        # DEBUG: Write to file to capture response
+        import json
+        with open("/tmp/facebook_pages_response.json", "w") as f:
+            json.dump(data, f, indent=2)
+
+        pages = data.get("data", [])
+        logger.info(f"Found {len(pages)} Facebook Pages for user via /me/accounts")
+        return pages
+
+    def _get_business_pages(self, user_access_token: str) -> list:
+        """
+        Get Facebook Pages from Business Manager portfolios.
+
+        Args:
+            user_access_token: User's Facebook access token
+
+        Returns:
+            List of page data dictionaries
+        """
+        all_business_pages = []
+
+        try:
+            # Get user's businesses
+            businesses_url = f"{self.graph_base_url}/me/businesses"
+            params = {
+                "access_token": user_access_token,
+                "fields": "id,name",
+            }
+
+            response = requests.get(businesses_url, params=params)
+            if response.status_code != 200:
+                logger.warning(f"Failed to fetch businesses: {response.text}")
+                return []
+
+            businesses_data = response.json()
+            businesses = businesses_data.get("data", [])
+            logger.info(f"Found {len(businesses)} businesses for user")
+
+            # For each business, get its pages
+            for business in businesses:
+                business_id = business.get("id")
+                business_name = business.get("name")
+                logger.info(f"Fetching pages for business: {business_name} (ID: {business_id})")
+
+                # Try client_pages first (pages managed by the business)
+                pages_url = f"{self.graph_base_url}/{business_id}/client_pages"
+                params = {
+                    "access_token": user_access_token,
+                    "fields": "id,name,access_token,category,instagram_business_account",
+                }
+
+                pages_response = requests.get(pages_url, params=params)
+                if pages_response.status_code == 200:
+                    pages_data = pages_response.json()
+                    pages = pages_data.get("data", [])
+                    logger.info(f"Found {len(pages)} pages via client_pages for business {business_name}")
+                    all_business_pages.extend(pages)
+                else:
+                    # Try owned_pages if client_pages doesn't work
+                    pages_url = f"{self.graph_base_url}/{business_id}/owned_pages"
+                    pages_response = requests.get(pages_url, params=params)
+                    if pages_response.status_code == 200:
+                        pages_data = pages_response.json()
+                        pages = pages_data.get("data", [])
+                        logger.info(f"Found {len(pages)} pages via owned_pages for business {business_name}")
+                        all_business_pages.extend(pages)
+                    else:
+                        logger.warning(f"Failed to fetch pages for business {business_name}: {pages_response.text}")
+
+            logger.info(f"Total business pages found: {len(all_business_pages)}")
+            return all_business_pages
+
+        except Exception as e:
+            logger.error(f"Error fetching business pages: {e}")
+            return []
+
+    def _merge_pages(self, personal_pages: list, business_pages: list) -> list:
+        """
+        Merge and deduplicate pages from personal and business sources.
+
+        Args:
+            personal_pages: Pages from /me/accounts
+            business_pages: Pages from /me/businesses
+
+        Returns:
+            Merged list of unique pages
+        """
+        seen_page_ids = set()
+        merged_pages = []
+
+        # Add personal pages first
+        for page in personal_pages:
+            page_id = page.get("id")
+            if page_id and page_id not in seen_page_ids:
+                seen_page_ids.add(page_id)
+                merged_pages.append(page)
+                logger.debug(f"Added personal page: {page.get('name')} (ID: {page_id})")
+
+        # Add business pages, skipping duplicates
+        for page in business_pages:
+            page_id = page.get("id")
+            if page_id and page_id not in seen_page_ids:
+                seen_page_ids.add(page_id)
+                merged_pages.append(page)
+                logger.debug(f"Added business page: {page.get('name')} (ID: {page_id})")
+            else:
+                logger.debug(f"Skipped duplicate page: {page.get('name')} (ID: {page_id})")
+
+        logger.info(f"Merged pages: {len(personal_pages)} personal + {len(business_pages)} business = {len(merged_pages)} total unique")
+        return merged_pages
 
     def _store_page_token(
         self,
@@ -256,6 +378,10 @@ class OAuthService:
             )
             db.add(social_account)
             db.flush()  # Get the ID without committing
+        else:
+            # Reactivate existing account when reconnecting
+            social_account.is_active = True
+            social_account.account_name = page_name  # Update name in case it changed
 
         # Get token expiration (Page tokens don't expire but we'll set a far future date)
         expires_at = datetime.utcnow() + timedelta(days=365 * 10)  # 10 years
@@ -379,6 +505,12 @@ class OAuthService:
             )
             db.add(social_account)
             db.flush()
+        else:
+            # Reactivate existing account when reconnecting
+            social_account.is_active = True
+            social_account.platform_username = ig_username
+            social_account.account_name = ig_name
+            social_account.metadata = {"profile_picture_url": ig_data.get("profile_picture_url")}
 
         # Encrypt the access token
         encrypted_token = self.encryption_service.encrypt(page_access_token)

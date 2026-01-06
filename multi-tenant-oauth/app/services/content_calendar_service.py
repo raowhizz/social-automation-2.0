@@ -1023,23 +1023,32 @@ class ContentCalendarService:
                         hashtags_str = " ".join([f"#{tag}" if not tag.startswith("#") else tag for tag in post.hashtags])
                         caption = f"{caption}\n\n{hashtags_str}"
 
+                    # Resolve image URL (prioritize direct URL over asset_id)
+                    # Direct URLs (like S3) should always take precedence over asset URLs (may be ngrok)
+                    image_url = post.image_url
+                    if not image_url and post.asset_id:
+                        # Fallback to asset if no direct URL
+                        asset = db.query(BrandAsset).filter(BrandAsset.id == post.asset_id).first()
+                        if asset:
+                            image_url = asset.file_url
+
                     # Post to platform
                     if platform == "facebook":
                         platform_post_id = self._post_to_facebook(
                             page_id=social_account.platform_account_id,
                             access_token=access_token,
                             caption=caption,
-                            image_url=post.image_url,
+                            image_url=image_url,
                         )
                         results.append({"platform": platform, "post_id": platform_post_id})
                     elif platform == "instagram":
-                        if not post.image_url:
+                        if not image_url:
                             raise Exception("Instagram posts require an image")
                         platform_post_id = self._post_to_instagram(
                             instagram_account_id=social_account.platform_account_id,
                             access_token=access_token,
                             caption=caption,
-                            image_url=post.image_url,
+                            image_url=image_url,
                         )
                         results.append({"platform": platform, "post_id": platform_post_id})
 

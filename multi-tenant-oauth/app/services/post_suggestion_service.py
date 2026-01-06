@@ -833,8 +833,9 @@ Write a compelling social media post ({length_preset['sentences']} sentences, ma
                     ).first()
 
                     if menu_item and menu_item.image_url:
-                        logger.info(f"Found menu item image for {item_name}")
-                        return menu_item.asset_id, menu_item.image_url
+                        logger.info(f"Found menu item image for {item_name}: {menu_item.image_url}")
+                        # Prioritize direct S3 URL over asset_id to avoid ngrok URLs
+                        return None, menu_item.image_url
 
             # Try to find brand assets with relevant tags
             tag_queries = []

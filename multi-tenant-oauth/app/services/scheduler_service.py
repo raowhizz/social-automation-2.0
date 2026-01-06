@@ -134,17 +134,7 @@ class SchedulerService:
             return False
 
         try:
-            # Get OAuth token
-            access_token = self.token_service.get_active_token(
-                db=db,
-                tenant_id=str(post.tenant_id),
-                platform=post.platform,
-            )
-
-            if not access_token:
-                raise Exception("No active OAuth token found")
-
-            # Get social account
+            # Get social account first
             from app.models import SocialAccount
 
             social_account = (
@@ -155,6 +145,17 @@ class SchedulerService:
 
             if not social_account:
                 raise Exception("Social account not found")
+
+            # Get OAuth token for specific account
+            access_token = self.token_service.get_active_token(
+                db=db,
+                tenant_id=str(post.tenant_id),
+                platform=post.platform,
+                platform_account_id=social_account.platform_account_id,
+            )
+
+            if not access_token:
+                raise Exception("No active OAuth token found")
 
             # Post to platform
             if post.platform == "facebook":

@@ -1518,13 +1518,21 @@
             accountsList.innerHTML = '';
 
             try {
-                const response = await fetch(`${API_URL}/api/v1/accounts/connected?tenant_id=${TENANT_ID}&platform=facebook`);
+                // Fetch both Facebook and Instagram accounts
+                const [facebookResponse, instagramResponse] = await Promise.all([
+                    fetch(`${API_URL}/api/v1/accounts/connected?tenant_id=${TENANT_ID}&platform=facebook`),
+                    fetch(`${API_URL}/api/v1/accounts/connected?tenant_id=${TENANT_ID}&platform=instagram`)
+                ]);
 
-                if (!response.ok) {
+                if (!facebookResponse.ok || !instagramResponse.ok) {
                     throw new Error('Failed to load accounts');
                 }
 
-                const accounts = await response.json();
+                const facebookAccounts = await facebookResponse.json();
+                const instagramAccounts = await instagramResponse.json();
+
+                // Combine both account types
+                const accounts = [...facebookAccounts, ...instagramAccounts];
 
                 loading.style.display = 'none';
 
@@ -1555,13 +1563,15 @@
                                 <div>
                                     <h3 style="margin: 0; color: #333; font-size: 18px;">${account.account_name || 'Facebook Page'}</h3>
                                     <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">
+                                        ${account.platform_username ? `@${account.platform_username}` : ''}
+                                        ${account.platform_username && account.platform_account_id ? ' • ' : ''}
                                         ${account.platform_account_id ? `ID: ${account.platform_account_id}` : ''}
                                     </p>
                                 </div>
                             </div>
                             ${statusBadge}
                             <p style="color: #666; font-size: 13px; margin: 10px 0 0 0;">
-                                Connected: ${new Date(account.created_at).toLocaleDateString()}
+                                Connected: ${account.connected_at ? new Date(account.connected_at).toLocaleDateString() : 'Unknown'}
                             </p>
                         </div>
                         <div style="display: flex; gap: 10px;">
@@ -1584,22 +1594,11 @@
         }
 
         function getStatusBadge(account) {
-            // Check token health
-            const now = new Date();
-            const expiresAt = account.token_expires_at ? new Date(account.token_expires_at) : null;
-
-            if (!expiresAt) {
-                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fef3c7; color: #92400e;">⚠️ Unknown Status</span>`;
-            }
-
-            const daysUntilExpiry = Math.floor((expiresAt - now) / (1000 * 60 * 60 * 24));
-
-            if (daysUntilExpiry < 0) {
-                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fee2e2; color: #991b1b;">❌ Expired</span>`;
-            } else if (daysUntilExpiry < 7) {
-                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fef3c7; color: #92400e;">⚠️ Expires in ${daysUntilExpiry} days</span>`;
+            // Since API only returns active accounts (is_active=True), show connected status
+            if (account.is_active) {
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #d1fae5; color: #065f46;">✅ Connected</span>`;
             } else {
-                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #d1fae5; color: #065f46;">✅ Connected (${daysUntilExpiry} days left)</span>`;
+                return `<span style="display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; background: #fee2e2; color: #991b1b;">❌ Disconnected</span>`;
             }
         }
 
@@ -1648,7 +1647,7 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/api/v1/oauth/accounts/${accountId}`, {
+                const response = await fetch(`${API_URL}/api/v1/oauth/accounts/${accountId}?tenant_id=${TENANT_ID}`, {
                     method: 'DELETE'
                 });
 
